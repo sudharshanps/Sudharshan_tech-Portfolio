@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "server": "node server/index.js",
     "start": "node server/index.js",
-    "test": "node scripts/test-persistence.mjs"
+    "test": "node scripts/test-persistence.mjs",
+    "test:load": "node scripts/load-test.mjs"
   },
   "dependencies": {
     "framer-motion": "^11.18.2",

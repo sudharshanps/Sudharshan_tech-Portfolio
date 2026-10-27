@@ -18,7 +18,7 @@ const serverIndexPath = path.join(rootDir, 'server', 'index.js');
 const { server, isPrivateIp, ADMIN_SECRET } = await import(pathToFileURL(serverIndexPath).href);
 
 // Helper to simulate HTTP requests against the Node http.Server listener directly
-function dispatch(server, { method, url, headers = {}, body = null }) {
+function dispatch(server, { method, url, headers = {}, body = null, remoteAddress = '127.0.0.1' }) {
   return new Promise((resolve, reject) => {
     const rawBody = body ? (typeof body === 'string' ? body : JSON.stringify(body)) : '';
     const bodyBuffer = Buffer.from(rawBody);
@@ -41,7 +41,7 @@ function dispatch(server, { method, url, headers = {}, body = null }) {
       'content-length': String(bodyBuffer.length),
       ...headers,
     };
-    req.socket = { remoteAddress: '127.0.0.1', destroy() {} };
+    req.socket = { remoteAddress, destroy() {} };
 
     // Mock outgoing response stream
     const chunks = [];
@@ -366,6 +366,175 @@ async function runSuite() {
     'AI assistant answers community and society question',
     aiCommunityRes.statusCode === 200 &&
       aiCommunityRes.json?.answer?.includes('Technology for Everyone')
+  );
+
+  // 13. Advanced SSRF Defense Checks
+  console.log('\n--- Auditing Extended SSRF & Protocol Defenses ---');
+  assert('SSRF blocks IPv4-mapped IPv6 (::ffff:127.0.0.1)', isPrivateIp('::ffff:127.0.0.1') === true);
+  assert('SSRF blocks IPv4-mapped private (::ffff:10.0.0.1)', isPrivateIp('::ffff:10.0.0.1') === true);
+  assert('SSRF blocks Carrier-Grade NAT (100.64.0.1)', isPrivateIp('100.64.0.1') === true);
+  assert('SSRF blocks Multicast address (224.0.0.1)', isPrivateIp('224.0.0.1') === true);
+  assert('SSRF permits standard public IPv4 (142.250.190.46)', isPrivateIp('142.250.190.46') === false);
+
+  // 14. High-Traffic Concurrent Submissions & Race Condition Safety
+  console.log('\n--- Auditing High-Traffic Concurrency & Race Condition Safety ---');
+  const CONCURRENT_COUNT = 10;
+  const concurrentRefs = [];
+  const parallelPromises = Array.from({ length: CONCURRENT_COUNT }).map((_, i) =>
+    dispatch(server, {
+      method: 'POST',
+      url: '/api/contact',
+      remoteAddress: `198.51.100.${i + 1}`,
+      body: {
+        fullName: `Concurrent Client #${i + 1}`,
+        email: `concurrent-${Date.now()}-${i + 1}@load-test.local`,
+        serviceType: 'Web Development',
+        projectDetails: `High-concurrency race condition automated stress test entry #${i + 1}`,
+      },
+    })
+  );
+
+  const parallelResponses = await Promise.all(parallelPromises);
+  const allSuccessful = parallelResponses.every((r) => r.statusCode === 200 && r.json?.success === true);
+  assert(`All ${CONCURRENT_COUNT} parallel submissions succeeded (HTTP 200)`, allSuccessful);
+
+  parallelResponses.forEach((r) => {
+    if (r.json?.referenceId) concurrentRefs.push(r.json.referenceId);
+  });
+  const uniqueRefs = new Set(concurrentRefs);
+  assert(
+    `All ${CONCURRENT_COUNT} generated tracking references are unique (no collisions)`,
+    uniqueRefs.size === CONCURRENT_COUNT
+  );
+
+  // Verify all are in disk storage
+  const diskAfterParallel = JSON.parse(
+    fs.readFileSync(path.join(rootDir, 'server', 'inquiries.json'), 'utf8')
+  );
+  const allSavedToDisk = concurrentRefs.every((ref) =>
+    diskAfterParallel.some((item) => item.referenceId === ref)
+  );
+  assert(`All ${CONCURRENT_COUNT} parallel records written to disk without write corruption`, allSavedToDisk);
+
+  // Clean up parallel test records
+  for (const ref of concurrentRefs) {
+    await dispatch(server, {
+      method: 'DELETE',
+      url: `/api/inquiries/${encodeURIComponent(ref)}`,
+      headers: { 'x-admin-token': ADMIN_SECRET },
+    });
+  }
+
+  // 15. Idempotency & Rapid Duplicate Submission Prevention
+  console.log('\n--- Auditing Idempotency & Duplicate Prevention ---');
+  const dedupePayload = {
+    fullName: 'Duplicate Clicker',
+    email: `rapid-click-${Date.now()}@idempotent.test`,
+    serviceType: 'Cloud & DevOps Infrastructure',
+    projectDetails: 'User double-clicked submit button twice in rapid succession.',
+  };
+
+  const firstSubmission = await dispatch(server, {
+    method: 'POST',
+    url: '/api/contact',
+    remoteAddress: '203.0.113.88',
+    body: dedupePayload,
+  });
+  assert('First submission succeeds (HTTP 200)', firstSubmission.statusCode === 200);
+  const initialRef = firstSubmission.json?.referenceId;
+
+  // Immediate second submission with identical payload from the same IP
+  const secondSubmission = await dispatch(server, {
+    method: 'POST',
+    url: '/api/contact',
+    remoteAddress: '203.0.113.88',
+    body: dedupePayload,
+  });
+  assert('Second rapid submission succeeds (HTTP 200)', secondSubmission.statusCode === 200);
+  assert(
+    'Second submission recognized as deduplicated',
+    secondSubmission.json?.deduplicated === true && secondSubmission.json?.referenceId === initialRef
+  );
+
+  // Clean up deduplication test record
+  if (initialRef) {
+    await dispatch(server, {
+      method: 'DELETE',
+      url: `/api/inquiries/${encodeURIComponent(initialRef)}`,
+      headers: { 'x-admin-token': ADMIN_SECRET },
+    });
+  }
+
+  // 16. Inquiries Pagination Verification
+  console.log('\n--- Auditing Admin Inquiries Pagination ---');
+  const paginatedRes = await dispatch(server, {
+    method: 'GET',
+    url: '/api/inquiries?page=1&limit=2',
+    headers: { 'x-admin-token': ADMIN_SECRET },
+  });
+  assert('GET /api/inquiries?page=1&limit=2 responds HTTP 200', paginatedRes.statusCode === 200);
+  assert(
+    'Pagination metadata returned correctly',
+    paginatedRes.json?.page === 1 && paginatedRes.json?.limit === 2 && typeof paginatedRes.json?.total === 'number'
+  );
+  assert(
+    'Pagination limits results to requested page size',
+    Array.isArray(paginatedRes.json?.inquiries) && paginatedRes.json.inquiries.length <= 2
+  );
+
+  // 17. Security Headers & Correlation ID
+  console.log('\n--- Auditing Security Headers & Correlation IDs ---');
+  const secHeadersRes = await dispatch(server, { method: 'GET', url: '/api/health' });
+  assert(
+    'Response contains X-Request-Id correlation header',
+    Boolean(secHeadersRes.headers['x-request-id'])
+  );
+  assert(
+    'Response contains X-Content-Type-Options: nosniff',
+    secHeadersRes.headers['x-content-type-options'] === 'nosniff'
+  );
+  assert(
+    'Response contains X-Frame-Options: SAMEORIGIN',
+    secHeadersRes.headers['x-frame-options'] === 'SAMEORIGIN'
+  );
+  assert(
+    'Response contains Content-Security-Policy header',
+    Boolean(secHeadersRes.headers['content-security-policy'])
+  );
+  assert(
+    'Response contains Permissions-Policy header',
+    Boolean(secHeadersRes.headers['permissions-policy'])
+  );
+
+  // 18. Caching Strategy Audit (Public vs Private)
+  console.log('\n--- Auditing Caching Strategy Headers ---');
+  const healthCacheRes = await dispatch(server, { method: 'GET', url: '/api/health' });
+  assert(
+    'GET /api/health enforces no-cache, no-store',
+    healthCacheRes.headers['cache-control']?.includes('no-store')
+  );
+
+  const statusCacheRes = await dispatch(server, { method: 'GET', url: '/api/status' });
+  assert(
+    'GET /api/status permits public caching with stale-while-revalidate',
+    statusCacheRes.headers['cache-control']?.includes('public')
+  );
+
+  const changelogCacheRes = await dispatch(server, { method: 'GET', url: '/api/changelog' });
+  assert(
+    'GET /api/changelog permits public caching',
+    changelogCacheRes.headers['cache-control']?.includes('public')
+  );
+
+  const adminInqCacheRes = await dispatch(server, {
+    method: 'GET',
+    url: '/api/inquiries',
+    headers: { 'x-admin-token': ADMIN_SECRET },
+  });
+  assert(
+    'GET /api/inquiries strictly forbids public caching (no-store, private)',
+    adminInqCacheRes.headers['cache-control']?.includes('no-store') &&
+      adminInqCacheRes.headers['cache-control']?.includes('private')
   );
 
   // Summary
