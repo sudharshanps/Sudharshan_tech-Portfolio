@@ -28,6 +28,154 @@ const INQUIRIES_FILE = path.join(__dirname, 'inquiries.json');
 const CHANGELOG_FILE = path.join(__dirname, 'changelog.json');
 const PULSE_FILE = path.join(__dirname, 'project-pulse.json');
 
+// Default initial changelog entries
+const DEFAULT_CHANGELOG = [
+  {
+    id: 'cl-2026-10-27-01',
+    date: 'Oct 27, 2026',
+    projectName: 'TECHNICO',
+    category: 'Release',
+    title: 'Product Catalog Dynamic Filtering & Inquiry Bridge',
+    description:
+      'Deployed optimized fast category indexes, responsive spec sheets, and instant quote inquiry handoff.',
+    verifiedStatus: 'Production Deployed',
+    keyChanges: [
+      'Indexed 120+ industrial instruments with instant client-side search',
+      'Configured automated WhatsApp and direct dispatch routing',
+      'Hardened CSP and resource compression headers on sterlitech.com',
+    ],
+  },
+  {
+    id: 'cl-2026-10-25-01',
+    date: 'Oct 25, 2026',
+    projectName: 'TaskGuard',
+    category: 'Feature',
+    title: 'Role-Based Access Control & Kanban Synchronization',
+    description:
+      'Implemented granular permission matrices (Admin, Lead, Developer, Viewer) and synchronized drag-and-drop task boards.',
+    verifiedStatus: 'Staging Build Passed',
+    keyChanges: [
+      'Integrated deterministic state transitions for task status changes',
+      'Built audit logging pipeline for security compliance',
+      'Designed responsive telemetry indices for sprint velocity',
+    ],
+  },
+  {
+    id: 'cl-2026-10-22-01',
+    date: 'Oct 22, 2026',
+    projectName: 'AI Invigilation Engine',
+    category: 'Improvement',
+    title: 'Edge Computer Vision Gaze Detection Landmark Calibration',
+    description:
+      'Refined MediaPipe 468-point facial mesh heuristics for head-pose pitch and yaw deviation scoring with zero server streaming.',
+    verifiedStatus: 'Benchmarked on Local CPU',
+    keyChanges: [
+      'Optimized matrix math using NumPy vectorized calculations (<32ms frame latency)',
+      'Added candidate anomaly event logging with timestamped frame snapshots',
+      'Hardened detection logic against momentary blinking false-positives',
+    ],
+  },
+  {
+    id: 'cl-2026-10-15-01',
+    date: 'Oct 15, 2026',
+    projectName: 'NIDHI SETU',
+    category: 'Architecture',
+    title: 'Civic Public Tech Scheme Classification Schema Blueprint',
+    description:
+      'Architected discovery engine matching citizen demographic attributes to verified state and national development grants.',
+    verifiedStatus: 'Architecture Approved',
+    keyChanges: [
+      'Built eligibility decision tree covering agriculture, MSME, and education grants',
+      'Structured plain-language document checklist generator',
+      'Implemented high-contrast accessible layout adhering to WCAG 2.1 AA',
+    ],
+  },
+];
+
+// Default initial project pulse records
+const DEFAULT_PULSE = [
+  {
+    id: 'technico',
+    title: 'TECHNICO',
+    pulseStage: 'Live Production',
+    lastUpdated: 'Oct 27, 2026',
+    pulseNote: 'Platform active in production at sterlitech.com with real customer quote generation.',
+    nextMilestone: 'Quarterly analytics audit and catalog expansion',
+    verifiedStatus: 'Production Deployed',
+  },
+  {
+    id: 'taskguard',
+    title: 'TaskGuard',
+    pulseStage: 'Active Development',
+    lastUpdated: 'Oct 25, 2026',
+    pulseNote: 'Sprint 4 completed: Kanban drag-drop, RBAC authorization, and SQLite audit log verification.',
+    nextMilestone: 'Automated notification webhooks and team invitation flow',
+    verifiedStatus: 'Staging Build Passed',
+  },
+  {
+    id: 'ai-invigilation',
+    title: 'AI Invigilation Engine',
+    pulseStage: 'Research',
+    lastUpdated: 'Oct 22, 2026',
+    pulseNote: 'Edge MediaPipe landmark geometry heuristics completed with sub-32ms inference on local consumer hardware.',
+    nextMilestone: 'Head pose pitch/yaw deviation test suite on varied lighting conditions',
+    verifiedStatus: 'Benchmarked on Local CPU',
+  },
+  {
+    id: 'air-painting',
+    title: 'Virtual Air Painting',
+    pulseStage: 'Prototype',
+    lastUpdated: 'Oct 20, 2026',
+    pulseNote: 'Interactive 21-point dual-finger gesture classification and frame buffer anti-aliased canvas verified.',
+    nextMilestone: 'WebAssembly OpenCV port for browser-native client testing',
+    verifiedStatus: 'Technical Prototype',
+  },
+  {
+    id: 'cinestream',
+    title: 'CineStream',
+    pulseStage: 'Prototype',
+    lastUpdated: 'Oct 18, 2026',
+    pulseNote: 'Streaming catalog responsive grid, instant modal video player, and watchlist local storage verified.',
+    nextMilestone: 'HLS adaptive bitrate chunk playback prototype',
+    verifiedStatus: 'Technical Prototype',
+  },
+  {
+    id: 'nidhi-setu',
+    title: 'NIDHI SETU',
+    pulseStage: 'Architecture',
+    lastUpdated: 'Oct 15, 2026',
+    pulseNote: 'Architecture & scheme eligibility decision matrix documented for public digital infrastructure.',
+    nextMilestone: 'Interactive prototype with multi-lingual assistance',
+    verifiedStatus: 'Architecture Approved',
+  },
+];
+
+function ensureFile(filePath, defaultData) {
+  try {
+    if (!fs.existsSync(filePath)) {
+      fs.writeFileSync(filePath, JSON.stringify(defaultData, null, 2), 'utf8');
+    }
+  } catch (err) {
+    console.error(`[Storage] Failed to initialize ${filePath}:`, err.message);
+  }
+}
+
+// Seed persistence files if missing
+ensureFile(CHANGELOG_FILE, DEFAULT_CHANGELOG);
+ensureFile(PULSE_FILE, DEFAULT_PULSE);
+ensureFile(INQUIRIES_FILE, []);
+
+// Admin Authorization check
+function isAuthorized(req) {
+  const token = req.headers['x-admin-token'];
+  const auth = req.headers['authorization'];
+  if (token && token === ADMIN_SECRET) return true;
+  if (auth && auth.startsWith('Bearer ')) {
+    return auth.slice(7).trim() === ADMIN_SECRET;
+  }
+  return false;
+}
+
 // Memory stores
 const rateLimitMap = new Map();
 
@@ -709,11 +857,213 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  // 6. Inquiries List (Admin Protected)
+  if (req.method === 'GET' && pathname === '/api/inquiries') {
+    if (!isAuthorized(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Unauthorized: Valid x-admin-token or Bearer token required.' }));
+      return;
+    }
+    try {
+      const data = fs.existsSync(INQUIRIES_FILE)
+        ? JSON.parse(fs.readFileSync(INQUIRIES_FILE, 'utf8') || '[]')
+        : [];
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: true, count: data.length, inquiries: data }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: `Failed to read inquiries: ${e.message}` }));
+    }
+    return;
+  }
+
+  // 7. Delete Inquiry (Admin Protected)
+  const deleteInquiryMatch = pathname.match(/^\/api\/inquiries\/([^/]+)$/);
+  if (req.method === 'DELETE' && deleteInquiryMatch) {
+    if (!isAuthorized(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Unauthorized: Valid x-admin-token or Bearer token required.' }));
+      return;
+    }
+    const targetRef = decodeURIComponent(deleteInquiryMatch[1]);
+    try {
+      let list = fs.existsSync(INQUIRIES_FILE)
+        ? JSON.parse(fs.readFileSync(INQUIRIES_FILE, 'utf8') || '[]')
+        : [];
+      const initialLen = list.length;
+      list = list.filter((item) => item.referenceId !== targetRef);
+      if (list.length === initialLen) {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: `Inquiry with reference ${targetRef} not found.` }));
+        return;
+      }
+      fs.writeFileSync(INQUIRIES_FILE, JSON.stringify(list, null, 2), 'utf8');
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: true, deleted: targetRef, remainingCount: list.length }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: `Failed to delete inquiry: ${e.message}` }));
+    }
+    return;
+  }
+
+  // 8. Changelog Read API
+  if (req.method === 'GET' && pathname === '/api/changelog') {
+    try {
+      const data = fs.existsSync(CHANGELOG_FILE)
+        ? JSON.parse(fs.readFileSync(CHANGELOG_FILE, 'utf8') || '[]')
+        : DEFAULT_CHANGELOG;
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: true, count: data.length, changelog: data }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: `Failed to read changelog: ${e.message}` }));
+    }
+    return;
+  }
+
+  // 9. Changelog Post API (Admin Protected)
+  if (req.method === 'POST' && pathname === '/api/changelog') {
+    if (!isAuthorized(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Unauthorized: Valid x-admin-token or Bearer token required.' }));
+      return;
+    }
+    let body = '';
+    req.on('data', (c) => {
+      body += c;
+      if (body.length > 64 * 1024) req.destroy();
+    });
+    req.on('end', () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+        const projectName = sanitize(payload.projectName);
+        const category = sanitize(payload.category) || 'Feature';
+        const title = sanitize(payload.title);
+        const description = sanitize(payload.description);
+        const verifiedStatus = sanitize(payload.verifiedStatus) || 'Verified';
+        const keyChanges = Array.isArray(payload.keyChanges) ? payload.keyChanges.map(sanitize) : [];
+
+        if (!projectName || !title || !description) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(
+            JSON.stringify({ error: 'Missing required fields: projectName, title, and description.' })
+          );
+          return;
+        }
+
+        const id = `cl-${Date.now()}`;
+        const date = new Date().toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+        });
+        const newEntry = {
+          id,
+          date,
+          projectName,
+          category,
+          title,
+          description,
+          verifiedStatus,
+          keyChanges,
+        };
+
+        let list = fs.existsSync(CHANGELOG_FILE)
+          ? JSON.parse(fs.readFileSync(CHANGELOG_FILE, 'utf8') || '[]')
+          : [];
+        list.unshift(newEntry);
+        fs.writeFileSync(CHANGELOG_FILE, JSON.stringify(list, null, 2), 'utf8');
+
+        res.writeHead(201, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, entry: newEntry }));
+      } catch {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Invalid JSON request payload' }));
+      }
+    });
+    return;
+  }
+
+  // 10. Project Pulse Read API
+  if (req.method === 'GET' && pathname === '/api/projects/pulse') {
+    try {
+      const data = fs.existsSync(PULSE_FILE)
+        ? JSON.parse(fs.readFileSync(PULSE_FILE, 'utf8') || '[]')
+        : DEFAULT_PULSE;
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: true, count: data.length, pulse: data }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: `Failed to read project pulse: ${e.message}` }));
+    }
+    return;
+  }
+
+  // 11. Project Pulse Update API (Admin Protected)
+  const updatePulseMatch = pathname.match(/^\/api\/projects\/pulse\/([^/]+)$/);
+  if (req.method === 'PUT' && updatePulseMatch) {
+    if (!isAuthorized(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Unauthorized: Valid x-admin-token or Bearer token required.' }));
+      return;
+    }
+    const projectId = decodeURIComponent(updatePulseMatch[1]).toLowerCase();
+    let body = '';
+    req.on('data', (c) => {
+      body += c;
+      if (body.length > 64 * 1024) req.destroy();
+    });
+    req.on('end', () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+        let list = fs.existsSync(PULSE_FILE)
+          ? JSON.parse(fs.readFileSync(PULSE_FILE, 'utf8') || '[]')
+          : [...DEFAULT_PULSE];
+        const idx = list.findIndex((item) => item.id.toLowerCase() === projectId);
+        if (idx === -1) {
+          res.writeHead(404, { 'Content-Type': 'application/json' });
+          res.end(
+            JSON.stringify({ error: `Project '${projectId}' not found in Project Pulse register.` })
+          );
+          return;
+        }
+
+        const date = new Date().toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+        });
+        list[idx] = {
+          ...list[idx],
+          ...(payload.pulseStage ? { pulseStage: sanitize(payload.pulseStage) } : {}),
+          ...(payload.pulseNote ? { pulseNote: sanitize(payload.pulseNote) } : {}),
+          ...(payload.nextMilestone ? { nextMilestone: sanitize(payload.nextMilestone) } : {}),
+          ...(payload.verifiedStatus ? { verifiedStatus: sanitize(payload.verifiedStatus) } : {}),
+          lastUpdated: date,
+        };
+
+        fs.writeFileSync(PULSE_FILE, JSON.stringify(list, null, 2), 'utf8');
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, updated: list[idx] }));
+      } catch {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Invalid JSON request payload' }));
+      }
+    });
+    return;
+  }
+
   // Not found
   res.writeHead(404, { 'Content-Type': 'application/json' });
   res.end(JSON.stringify({ error: 'Endpoint not found' }));
 });
 
-server.listen(PORT, () => {
-  console.log(`SUDHARSHAN_TECH Backend & Health Monitoring Server active on port ${PORT}`);
-});
+if (process.env.NODE_ENV !== 'test') {
+  server.listen(PORT, () => {
+    console.log(`SUDHARSHAN_TECH Backend & Health Monitoring Server active on port ${PORT}`);
+  });
+}
+
+export { server, isPrivateIp, sanitize, ADMIN_SECRET };

@@ -6,12 +6,18 @@ import { Button } from './ui/Button';
 
 interface ContactSectionProps {
   preselectedService?: string;
+  initialProjectDetails?: string;
+  initialBudget?: string;
+  initialTimeline?: string;
   onOpenEstimator?: () => void;
   onOpenScheduler?: () => void;
 }
 
 export const ContactSection: React.FC<ContactSectionProps> = ({
   preselectedService = '',
+  initialProjectDetails = '',
+  initialBudget = '',
+  initialTimeline = '',
   onOpenEstimator,
   onOpenScheduler,
 }) => {
@@ -21,13 +27,15 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
     phone: '',
     company: '',
     serviceType: preselectedService || 'Web Development',
-    budgetRange: '₹50,000 - ₹1,50,000',
-    projectDetails: '',
+    budgetRange: initialBudget || '₹50,000 - ₹1,50,000',
+    timeline: initialTimeline || '2-4 weeks',
+    projectDetails: initialProjectDetails || '',
     _gotcha: '', // Honeypot spam protection
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [submittedReference, setSubmittedReference] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
 
   // Update if preselectedService changes
@@ -36,6 +44,18 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
       setFormData((prev) => ({ ...prev, serviceType: preselectedService }));
     }
   }, [preselectedService]);
+
+  // Update if estimator or audit details are passed in
+  React.useEffect(() => {
+    if (initialProjectDetails || initialBudget || initialTimeline) {
+      setFormData((prev) => ({
+        ...prev,
+        projectDetails: initialProjectDetails || prev.projectDetails,
+        budgetRange: initialBudget || prev.budgetRange,
+        timeline: initialTimeline || prev.timeline,
+      }));
+    }
+  }, [initialProjectDetails, initialBudget, initialTimeline]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -70,25 +90,29 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
     setIsSubmitting(true);
 
     try {
-      // Check if backend API endpoint is reachable, otherwise gracefully simulate reliable delivery
-      try {
-        await fetch('/api/contact', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData),
-        });
-      } catch {
-        // Backend not mounted on same port; proceed with local verified dispatch confirmation
-      }
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
 
-      // Simulated dispatch delay for seamless visual feedback
-      setTimeout(() => {
-        setIsSubmitting(false);
+      const result = await response.json().catch(() => null);
+
+      if (response.ok && result?.success) {
+        setSubmittedReference(result.referenceId || null);
         setIsSubmitted(true);
-      }, 600);
+      } else {
+        const errorMsg =
+          result?.error ||
+          `Submission failed with status ${response.status}. Please try again or reach out directly.`;
+        setFormError(errorMsg);
+      }
     } catch {
+      setFormError(
+        `Unable to reach the server. Please check your internet connection or email directly at ${COMPANY_INFO.email}.`
+      );
+    } finally {
       setIsSubmitting(false);
-      setFormError('An unexpected error occurred. Please contact us directly via email or phone.');
     }
   };
 
@@ -221,13 +245,17 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                   <p className="text-sm text-slate-600 max-w-md mx-auto leading-relaxed">
                     Thank you, <strong>{formData.fullName}</strong>. We have received your project details regarding <strong>{formData.serviceType}</strong> and will reach out to <strong>{formData.email}</strong> within 24 hours.
                   </p>
-                  <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 max-w-xs mx-auto text-xs font-mono text-slate-500">
-                    Reference: ST-REQ-{Math.floor(100000 + Math.random() * 900000)}
-                  </div>
+                  {submittedReference && (
+                    <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 max-w-xs mx-auto text-xs font-mono text-slate-700">
+                      <span className="text-slate-400 block text-[10px] uppercase tracking-wider mb-0.5">Tracking Reference</span>
+                      <span className="font-bold text-brand-blue">{submittedReference}</span>
+                    </div>
+                  )}
                   <div className="pt-4 flex items-center justify-center gap-3">
                     <button
                       onClick={() => {
                         setIsSubmitted(false);
+                        setSubmittedReference(null);
                         setFormData({
                           fullName: '',
                           email: '',
@@ -235,6 +263,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                           company: '',
                           serviceType: 'Web Development',
                           budgetRange: '₹50,000 - ₹1,50,000',
+                          timeline: '2-4 weeks',
                           projectDetails: '',
                           _gotcha: '',
                         });

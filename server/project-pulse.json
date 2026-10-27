@@ -1,0 +1,56 @@
+[
+  {
+    "id": "technico",
+    "title": "TECHNICO",
+    "pulseStage": "Live Production",
+    "lastUpdated": "Oct 27, 2026",
+    "pulseNote": "Platform active in production at sterlitech.com with real customer quote generation.",
+    "nextMilestone": "Quarterly analytics audit and catalog expansion",
+    "verifiedStatus": "Production Deployed"
+  },
+  {
+    "id": "taskguard",
+    "title": "TaskGuard",
+    "pulseStage": "Active Development",
+    "lastUpdated": "Oct 27, 2026",
+    "pulseNote": "Sprint 4 completed: Kanban drag-drop, RBAC authorization, and SQLite audit log verified.",
+    "nextMilestone": "Production deployment checklist review",
+    "verifiedStatus": "Staging Build Passed"
+  },
+  {
+    "id": "ai-invigilation",
+    "title": "AI Invigilation Engine",
+    "pulseStage": "Research",
+    "lastUpdated": "Oct 22, 2026",
+    "pulseNote": "Edge MediaPipe landmark geometry heuristics completed with sub-32ms inference on local consumer hardware.",
+    "nextMilestone": "Head pose pitch/yaw deviation test suite on varied lighting conditions",
+    "verifiedStatus": "Benchmarked on Local CPU"
+  },
+  {
+    "id": "air-painting",
+    "title": "Virtual Air Painting",
+    "pulseStage": "Prototype",
+    "lastUpdated": "Oct 20, 2026",
+    "pulseNote": "Interactive 21-point dual-finger gesture classification and frame buffer anti-aliased canvas verified.",
+    "nextMilestone": "WebAssembly OpenCV port for browser-native client testing",
+    "verifiedStatus": "Technical Prototype"
+  },
+  {
+    "id": "cinestream",
+    "title": "CineStream",
+    "pulseStage": "Prototype",
+    "lastUpdated": "Oct 18, 2026",
+    "pulseNote": "Streaming catalog responsive grid, instant modal video player, and watchlist local storage verified.",
+    "nextMilestone": "HLS adaptive bitrate chunk playback prototype",
+    "verifiedStatus": "Technical Prototype"
+  },
+  {
+    "id": "nidhi-setu",
+    "title": "NIDHI SETU",
+    "pulseStage": "Architecture",
+    "lastUpdated": "Oct 15, 2026",
+    "pulseNote": "Architecture & scheme eligibility decision matrix documented for public digital infrastructure.",
+    "nextMilestone": "Interactive prototype with multi-lingual assistance",
+    "verifiedStatus": "Architecture Approved"
+  }
+]

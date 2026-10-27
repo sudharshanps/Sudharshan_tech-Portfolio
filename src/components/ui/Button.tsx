@@ -7,7 +7,7 @@ export interface ButtonProps {
   size?: 'sm' | 'md' | 'lg';
   animation?: 'nudge' | 'fly-through' | 'none';
   nudgeDirection?: 'right' | 'down';
-  contextualIcon?: 'arrow' | 'diagonal' | 'phone' | 'download' | 'send' | 'external';
+  contextualIcon?: 'arrow' | 'diagonal' | 'phone' | 'download' | 'send' | 'external' | 'none';
   onClick?: (e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => void;
   href?: string;
   type?: 'button' | 'submit' | 'reset';
@@ -83,7 +83,7 @@ export const Button: React.FC<ButtonProps> = ({
   // Render Inner Content
   const renderContent = () => {
     // 1. Icon-Nudge (Default for all navigation, projects, and downloads)
-    if (animation === 'nudge') {
+    if (animation === 'nudge' && contextualIcon !== 'none') {
       return (
         <span className="inline-flex items-center justify-center gap-1.5 whitespace-nowrap">
           <span className="whitespace-nowrap">{children}</span>
@@ -95,7 +95,7 @@ export const Button: React.FC<ButtonProps> = ({
     }
 
     // 2. Arrow Fly-Through (Synchronized width windows)
-    if (animation === 'fly-through') {
+    if (animation === 'fly-through' && contextualIcon !== 'none') {
       return (
         <span className="btn-flythrough-inner">
           <span className="btn-window-leading" aria-hidden="true">
@@ -113,17 +113,17 @@ export const Button: React.FC<ButtonProps> = ({
       );
     }
 
-    // 3. Static button
-    return <span className="whitespace-nowrap">{children}</span>;
+    // 3. Static button without trailing animation icon
+    return <span className="inline-flex items-center justify-center gap-1.5 whitespace-nowrap">{children}</span>;
   };
 
   // Nudge animation class hook
   const animationClass =
-    animation === 'nudge'
+    animation === 'nudge' && contextualIcon !== 'none'
       ? nudgeDirection === 'down'
         ? 'button-download'
         : 'button-forward'
-      : animation === 'fly-through'
+      : animation === 'fly-through' && contextualIcon !== 'none'
       ? 'btn-flythrough'
       : '';
 

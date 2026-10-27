@@ -34,6 +34,14 @@ export const SmartEstimatorModal: React.FC<SmartEstimatorModalProps> = ({
   const [timeline, setTimeline] = useState<string>('Standard (4–6 Weeks)');
   const [budgetTier, setBudgetTier] = useState<string>('Standard Commercial Scope');
 
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   const currentService =
@@ -374,6 +382,7 @@ Recommended Stack: ${currentService.recommendedStack.join(', ')}`;
                   onClick={handleFinishAndTransfer}
                   variant="primary"
                   size="sm"
+                  contextualIcon="none"
                   className="text-xs font-mono"
                 >
                   <Send className="w-3.5 h-3.5 mr-1.5" />

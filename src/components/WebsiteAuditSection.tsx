@@ -103,6 +103,7 @@ export const WebsiteAuditSection: React.FC<WebsiteAuditSectionProps> = ({
                 type="submit"
                 variant="primary"
                 size="md"
+                contextualIcon="none"
                 disabled={isLoading}
                 className="shrink-0 text-xs font-mono"
               >

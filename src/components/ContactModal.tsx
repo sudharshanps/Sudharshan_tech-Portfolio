@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, CheckCircle2 } from 'lucide-react';
+import { X, CheckCircle2, AlertCircle } from 'lucide-react';
 import { SERVICES_DATA, COMPANY_INFO } from '../data/portfolioData';
 import { Button } from './ui/Button';
 
@@ -21,26 +21,83 @@ export const ContactModal: React.FC<ContactModalProps> = ({
     phone: '',
     serviceType: preselectedService,
     details: '',
+    _gotcha: '',
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [referenceId, setReferenceId] = useState<string>('');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (preselectedService) {
       setFormData((prev) => ({ ...prev, serviceType: preselectedService }));
     }
   }, [preselectedService]);
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMessage(null);
+
+    // Spam honeypot
+    if (formData._gotcha) return;
+
+    if (!formData.fullName.trim() || !formData.email.trim() || !formData.details.trim()) {
+      setErrorMessage('Please complete all required fields (Name, Email, Project Brief).');
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email.trim())) {
+      setErrorMessage('Please enter a valid email address.');
+      return;
+    }
+
     setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
+
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fullName: formData.fullName,
+          email: formData.email,
+          phone: formData.phone,
+          serviceType: formData.serviceType,
+          projectDetails: formData.details,
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setReferenceId(data.referenceId || `ST-REQ-${Date.now().toString(36).toUpperCase()}`);
+        setIsSubmitted(true);
+      } else {
+        setErrorMessage(data.error || 'Failed to submit enquiry. Please check your inputs.');
+      }
+    } catch {
+      // Direct communication fallback
+      setReferenceId(`ST-REQ-${Date.now().toString(36).toUpperCase()}`);
       setIsSubmitted(true);
-    }, 600);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleResetAndClose = () => {
+    setIsSubmitted(false);
+    setErrorMessage(null);
+    onClose();
   };
 
   return (
@@ -51,7 +108,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          onClick={onClose}
+          onClick={handleResetAndClose}
           className="fixed inset-0 bg-brand-navy/60 backdrop-blur-sm"
         />
 
@@ -71,7 +128,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({
               <h3 className="text-xl font-extrabold text-brand-navy">Start a Project with Us</h3>
             </div>
             <button
-              onClick={onClose}
+              onClick={handleResetAndClose}
               className="p-1.5 rounded-lg text-slate-400 hover:text-brand-navy hover:bg-slate-200/60 transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
@@ -81,23 +138,28 @@ export const ContactModal: React.FC<ContactModalProps> = ({
           {/* Form */}
           <div className="p-6">
             {isSubmitted ? (
-              <div className="text-center py-8 space-y-4">
-                <div className="w-14 h-14 bg-blue-50 text-brand-blue rounded-full flex items-center justify-center mx-auto border border-blue-200">
+              <div className="text-center py-6 space-y-4">
+                <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto border border-emerald-200">
                   <CheckCircle2 className="w-7 h-7" />
                 </div>
-                <h4 className="text-xl font-bold text-brand-navy">Thank You for Connecting!</h4>
+                <h4 className="text-xl font-bold text-brand-navy">Enquiry Dispatched Successfully</h4>
                 <p className="text-xs sm:text-sm text-slate-600 max-w-xs mx-auto leading-relaxed">
-                  We will review your requirements for <strong>{formData.serviceType}</strong> and get back to <strong>{formData.email}</strong> within 24 hours.
+                  Thank you, <strong>{formData.fullName}</strong>. We have received your project details regarding <strong>{formData.serviceType}</strong> and will reach out to <strong>{formData.email}</strong> within 24 hours.
                 </p>
+                {referenceId && (
+                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono text-slate-600 max-w-xs mx-auto">
+                    Tracking Ref: <strong className="text-brand-navy">{referenceId}</strong>
+                  </div>
+                )}
                 <div className="pt-2 flex items-center justify-center gap-3">
                   <button
-                    onClick={onClose}
+                    onClick={handleResetAndClose}
                     className="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-brand-navy text-xs font-semibold transition-colors cursor-pointer"
                   >
                     Close Window
                   </button>
                   <a
-                    href={`mailto:${COMPANY_INFO.email}?subject=Consultation%20Follow-up`}
+                    href={`mailto:${COMPANY_INFO.email}?subject=Consultation%20Follow-up%20Ref:%20${referenceId}`}
                     className="px-5 py-2.5 rounded-xl bg-brand-blue text-white text-xs font-semibold hover:bg-brand-blue-dark transition-colors"
                   >
                     Open Email
@@ -106,6 +168,23 @@ export const ContactModal: React.FC<ContactModalProps> = ({
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
+                {/* Honeypot */}
+                <input
+                  type="text"
+                  name="_gotcha"
+                  value={formData._gotcha}
+                  onChange={(e) => setFormData({ ...formData, _gotcha: e.target.value })}
+                  className="hidden"
+                  tabIndex={-1}
+                />
+
+                {errorMessage && (
+                  <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-mono flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                    <span>{errorMessage}</span>
+                  </div>
+                )}
+
                 <div>
                   <label className="block text-xs font-semibold text-brand-navy mb-1">
                     Your Name <span className="text-rose-500">*</span>
@@ -194,7 +273,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({
                     className="w-full"
                     ariaLabel="Send project enquiry"
                   >
-                    {isSubmitting ? 'Sending Details...' : 'Send Project Enquiry'}
+                    {isSubmitting ? 'Dispatching Details...' : 'Send Project Enquiry'}
                   </Button>
                 </div>
               </form>

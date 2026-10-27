@@ -1,0 +1,58 @@
+[
+  {
+    "id": "cl-2026-10-27-01",
+    "date": "Oct 27, 2026",
+    "projectName": "TECHNICO",
+    "category": "Release",
+    "title": "Product Catalog Dynamic Filtering & Inquiry Bridge",
+    "description": "Deployed optimized fast category indexes, responsive spec sheets, and instant quote inquiry handoff.",
+    "verifiedStatus": "Production Deployed",
+    "keyChanges": [
+      "Indexed 120+ industrial instruments with instant client-side search",
+      "Configured automated WhatsApp and direct dispatch routing",
+      "Hardened CSP and resource compression headers on sterlitech.com"
+    ]
+  },
+  {
+    "id": "cl-2026-10-25-01",
+    "date": "Oct 25, 2026",
+    "projectName": "TaskGuard",
+    "category": "Feature",
+    "title": "Role-Based Access Control & Kanban Synchronization",
+    "description": "Implemented granular permission matrices (Admin, Lead, Developer, Viewer) and synchronized drag-and-drop task boards.",
+    "verifiedStatus": "Staging Build Passed",
+    "keyChanges": [
+      "Integrated deterministic state transitions for task status changes",
+      "Built audit logging pipeline for security compliance",
+      "Designed responsive telemetry indices for sprint velocity"
+    ]
+  },
+  {
+    "id": "cl-2026-10-22-01",
+    "date": "Oct 22, 2026",
+    "projectName": "AI Invigilation Engine",
+    "category": "Improvement",
+    "title": "Edge Computer Vision Gaze Detection Landmark Calibration",
+    "description": "Refined MediaPipe 468-point facial mesh heuristics for head-pose pitch and yaw deviation scoring with zero server streaming.",
+    "verifiedStatus": "Benchmarked on Local CPU",
+    "keyChanges": [
+      "Optimized matrix math using NumPy vectorized calculations (<32ms frame latency)",
+      "Added candidate anomaly event logging with timestamped frame snapshots",
+      "Hardened detection logic against momentary blinking false-positives"
+    ]
+  },
+  {
+    "id": "cl-2026-10-15-01",
+    "date": "Oct 15, 2026",
+    "projectName": "NIDHI SETU",
+    "category": "Architecture",
+    "title": "Civic Public Tech Scheme Classification Schema Blueprint",
+    "description": "Architected discovery engine matching citizen demographic attributes to verified state and national development grants.",
+    "verifiedStatus": "Architecture Approved",
+    "keyChanges": [
+      "Built eligibility decision tree covering agriculture, MSME, and education grants",
+      "Structured plain-language document checklist generator",
+      "Implemented high-contrast accessible layout adhering to WCAG 2.1 AA"
+    ]
+  }
+]

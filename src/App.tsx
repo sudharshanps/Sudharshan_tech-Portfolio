@@ -37,6 +37,9 @@ export const App: React.FC = () => {
   const [isEstimatorModalOpen, setIsEstimatorModalOpen] = useState(false);
   const [isSchedulerModalOpen, setIsSchedulerModalOpen] = useState(false);
   const [selectedService, setSelectedService] = useState('Web Development');
+  const [transferredBrief, setTransferredBrief] = useState('');
+  const [transferredBudget, setTransferredBudget] = useState('');
+  const [transferredTimeline, setTransferredTimeline] = useState('');
   const [activeProjectModal, setActiveProjectModal] = useState<Project | null>(null);
 
   // Sync with browser history popstate
@@ -87,18 +90,25 @@ export const App: React.FC = () => {
   };
 
   const handleTransferEstimatorBrief = (
-    _briefText: string,
+    briefText: string,
     serviceName: string,
-    _budget: string,
-    _timeline: string
+    budget: string,
+    timeline: string
   ) => {
     setSelectedService(serviceName);
+    setTransferredBrief(briefText);
+    setTransferredBudget(budget);
+    setTransferredTimeline(timeline);
     handleSelectServiceForInquiry(serviceName);
   };
 
   const handleStartInquiryWithAudit = (url: string, score: number) => {
-    setSelectedService('Cybersecurity & Code Hardening');
-    handleSelectServiceForInquiry(`Website Remediation for ${url} (Score: ${score}/100)`);
+    const serviceName = 'Cybersecurity & Code Hardening';
+    setSelectedService(serviceName);
+    setTransferredBrief(
+      `Preliminary Security & Performance Audit for ${url} (Score: ${score}/100).\nWe request a remediation plan covering discovered HTTP header, latency, and markup observations.`
+    );
+    handleSelectServiceForInquiry(serviceName);
   };
 
   // Render Status Center view
@@ -180,6 +190,9 @@ export const App: React.FC = () => {
         {/* 11 — Contact CTA & Project Enquiry Form */}
         <ContactSection
           preselectedService={selectedService}
+          initialProjectDetails={transferredBrief}
+          initialBudget={transferredBudget}
+          initialTimeline={transferredTimeline}
           onOpenEstimator={() => setIsEstimatorModalOpen(true)}
           onOpenScheduler={() => setIsSchedulerModalOpen(true)}
         />
