@@ -3,7 +3,7 @@ import { ArrowUp, Mail, MapPin, Phone, Instagram, Activity, GitCommit, ShieldChe
 import { COMPANY_INFO, SERVICES_DATA } from '../data/portfolioData';
 
 interface FooterProps {
-  onNavigate?: (view: 'home' | 'status' | 'changelog') => void;
+  onNavigate?: (view: 'home' | 'status' | 'changelog' | 'not-found') => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {

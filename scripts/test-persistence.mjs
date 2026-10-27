@@ -275,6 +275,48 @@ async function runSuite() {
   });
   assert('AI assistant answers services question', aiServicesRes.statusCode === 200 && aiServicesRes.json?.answer?.includes('Web Development'));
 
+  // 10. Input Validation & Edge Case Rejections
+  console.log('\n--- Auditing Server Validation & Error Handling ---');
+  const emptyReqRes = await dispatch(server, {
+    method: 'POST',
+    url: '/api/contact',
+    body: { fullName: '', email: 'missing-name@test.com' },
+  });
+  assert('POST /api/contact with missing fields returns HTTP 400', emptyReqRes.statusCode === 400);
+
+  const invalidEmailRes = await dispatch(server, {
+    method: 'POST',
+    url: '/api/contact',
+    body: { fullName: 'User', email: 'not-an-email', projectDetails: 'Details' },
+  });
+  assert('POST /api/contact with malformed email returns HTTP 400', invalidEmailRes.statusCode === 400);
+
+  // 11. Consultation Booking Full Flow
+  console.log('\n--- Auditing Consultation Discovery Flow ---');
+  const bookingRes = await dispatch(server, {
+    method: 'POST',
+    url: '/api/contact',
+    body: {
+      fullName: 'Enterprise Client',
+      email: 'client@enterprise.com',
+      phone: '+91 9888888888',
+      serviceType: 'Consultation Booking',
+      projectDetails: '[SCHEDULED CONSULTATION REQUEST] Topic: AI Architecture | Timezone: IST',
+    },
+  });
+  assert('Consultation booking responds HTTP 200', bookingRes.statusCode === 200);
+  assert('Consultation booking returns valid referenceId', typeof bookingRes.json?.referenceId === 'string' && bookingRes.json.referenceId.startsWith('ST-'));
+
+  // Clean up booking inquiry from disk
+  const bookingRef = bookingRes.json?.referenceId;
+  if (bookingRef) {
+    await dispatch(server, {
+      method: 'DELETE',
+      url: `/api/inquiries/${encodeURIComponent(bookingRef)}`,
+      headers: { 'x-admin-token': ADMIN_SECRET },
+    });
+  }
+
   // Summary
   console.log('\n======================================================');
   const passedCount = results.filter((r) => r.pass).length;

@@ -33,6 +33,16 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({ onOpenEnqu
     }
   }, [messages, isOpen]);
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        setIsOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen]);
+
   const handleSend = async (customText?: string) => {
     const textToSend = customText || inputValue.trim();
     if (!textToSend || isLoading) return;

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Calendar, CheckCircle2, Send } from 'lucide-react';
+import { X, Calendar, CheckCircle2, Send, AlertTriangle } from 'lucide-react';
 import { Button } from './ui/Button';
 
 interface ScheduleMeetingModalProps {
@@ -19,6 +19,7 @@ export const ScheduleMeetingModal: React.FC<ScheduleMeetingModalProps> = ({ isOp
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [referenceId, setReferenceId] = useState('');
+  const [formError, setFormError] = useState<string | null>(null);
 
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -32,7 +33,18 @@ export const ScheduleMeetingModal: React.FC<ScheduleMeetingModalProps> = ({ isOp
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!fullName || !email) return;
+    setFormError(null);
+
+    if (!fullName.trim() || !email.trim()) {
+      setFormError('Please enter your full name and email address.');
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      setFormError('Please enter a valid email address.');
+      return;
+    }
 
     setIsSubmitting(true);
     const bookingDetails = `[SCHEDULED CONSULTATION REQUEST]
@@ -47,20 +59,28 @@ Notes: ${notes || 'Standard 30-minute technical discovery session'}`;
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          fullName,
-          email,
-          phone,
+          fullName: fullName.trim(),
+          email: email.trim(),
+          phone: phone.trim(),
           serviceType: 'Consultation Booking',
           projectDetails: bookingDetails,
         }),
       });
 
-      const data = await res.json();
-      setReferenceId(data.referenceId || `ST-MTG-${Date.now().toString(36).toUpperCase()}`);
-      setIsConfirmed(true);
+      const data = await res.json().catch(() => null);
+      if (res.ok && data?.success) {
+        setReferenceId(data.referenceId || `ST-MTG-${Date.now().toString(36).toUpperCase()}`);
+        setIsConfirmed(true);
+      } else {
+        setFormError(
+          data?.error ||
+            `Booking request could not be completed (status ${res.status}). Please try again or reach out directly.`
+        );
+      }
     } catch {
-      setReferenceId(`ST-MTG-${Date.now().toString(36).toUpperCase()}`);
-      setIsConfirmed(true);
+      setFormError(
+        'Unable to connect to the scheduling service. Please check your internet connection or email directly at sudharshanthemagnet@gmail.com.'
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -68,6 +88,7 @@ Notes: ${notes || 'Standard 30-minute technical discovery session'}`;
 
   const handleReset = () => {
     setIsConfirmed(false);
+    setFormError(null);
     onClose();
   };
 
@@ -155,6 +176,12 @@ Notes: ${notes || 'Standard 30-minute technical discovery session'}`;
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
+                {formError && (
+                  <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-mono flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+                    <span>{formError}</span>
+                  </div>
+                )}
                 <div>
                   <label className="block text-xs font-mono uppercase tracking-wider text-slate-500 font-semibold mb-1">
                     Discussion Topic

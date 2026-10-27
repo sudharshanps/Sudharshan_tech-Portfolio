@@ -19,18 +19,20 @@ import { ScheduleMeetingModal } from './components/ScheduleMeetingModal';
 import { AIAssistantWidget } from './components/AIAssistantWidget';
 import { StatusPage } from './components/StatusPage';
 import { ChangelogPage } from './components/ChangelogPage';
+import { NotFoundPage } from './components/NotFoundPage';
 import { Project } from './types';
 
-type CurrentView = 'home' | 'status' | 'changelog';
+type CurrentView = 'home' | 'status' | 'changelog' | 'not-found';
 
 export const App: React.FC = () => {
   // Client router initialization
   const [currentView, setCurrentView] = useState<CurrentView>(() => {
     const path = window.location.pathname.toLowerCase();
     const hash = window.location.hash.toLowerCase();
+    if (path === '/' || path === '' || path === '/home' || path === '/index.html') return 'home';
     if (path.includes('/status') || hash.includes('status')) return 'status';
     if (path.includes('/changelog') || hash.includes('changelog')) return 'changelog';
-    return 'home';
+    return 'not-found';
   });
 
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
@@ -47,12 +49,14 @@ export const App: React.FC = () => {
     const handlePopState = () => {
       const path = window.location.pathname.toLowerCase();
       const hash = window.location.hash.toLowerCase();
-      if (path.includes('/status') || hash.includes('status')) {
+      if (path === '/' || path === '' || path === '/home' || path === '/index.html') {
+        setCurrentView('home');
+      } else if (path.includes('/status') || hash.includes('status')) {
         setCurrentView('status');
       } else if (path.includes('/changelog') || hash.includes('changelog')) {
         setCurrentView('changelog');
       } else {
-        setCurrentView('home');
+        setCurrentView('not-found');
       }
     };
 
@@ -139,6 +143,27 @@ export const App: React.FC = () => {
         />
         <main className="flex-1">
           <ChangelogPage onBack={() => navigateTo('home')} />
+        </main>
+        <Footer onNavigate={navigateTo} />
+      </div>
+    );
+  }
+
+  // Render 404 Endpoint Not Found view
+  if (currentView === 'not-found') {
+    return (
+      <div className="min-h-screen bg-slate-50 text-brand-navy flex flex-col">
+        <Navbar
+          onOpenContactModal={() => handleOpenContactModal()}
+          onNavigate={navigateTo}
+          currentView={currentView}
+        />
+        <main className="flex-1">
+          <NotFoundPage
+            onBack={() => navigateTo('home')}
+            onNavigateStatus={() => navigateTo('status')}
+            onNavigateChangelog={() => navigateTo('changelog')}
+          />
         </main>
         <Footer onNavigate={navigateTo} />
       </div>

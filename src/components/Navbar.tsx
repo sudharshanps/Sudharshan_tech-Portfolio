@@ -6,8 +6,8 @@ import { Button } from './ui/Button';
 
 interface NavbarProps {
   onOpenContactModal: () => void;
-  onNavigate: (view: 'home' | 'status' | 'changelog') => void;
-  currentView: 'home' | 'status' | 'changelog';
+  onNavigate: (view: 'home' | 'status' | 'changelog' | 'not-found') => void;
+  currentView: 'home' | 'status' | 'changelog' | 'not-found';
 }
 
 const NAV_LINKS = [

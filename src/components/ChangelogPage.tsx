@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   ArrowLeft,
   Search,
@@ -10,23 +10,37 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { CHANGELOG_DATA } from '../data/portfolioData';
-import { ChangelogCategory } from '../types';
+import { ChangelogCategory, ChangelogEntry } from '../types';
 
 interface ChangelogPageProps {
   onBack: () => void;
 }
 
 export const ChangelogPage: React.FC<ChangelogPageProps> = ({ onBack }) => {
+  const [entries, setEntries] = useState<ChangelogEntry[]>(CHANGELOG_DATA);
   const [selectedProject, setSelectedProject] = useState<string>('all');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
+  useEffect(() => {
+    fetch('/api/changelog')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.changelog && Array.isArray(data.changelog) && data.changelog.length > 0) {
+          setEntries(data.changelog);
+        }
+      })
+      .catch(() => {
+        // Fallback to static CHANGELOG_DATA
+      });
+  }, []);
+
   // Extract unique project list
   const projects = useMemo(() => {
     const set = new Set<string>();
-    CHANGELOG_DATA.forEach((entry) => set.add(entry.projectName));
+    entries.forEach((entry) => set.add(entry.projectName));
     return Array.from(set);
-  }, []);
+  }, [entries]);
 
   const categories: { id: string; label: string }[] = [
     { id: 'all', label: 'All Categories' },
@@ -38,7 +52,7 @@ export const ChangelogPage: React.FC<ChangelogPageProps> = ({ onBack }) => {
   ];
 
   const filteredEntries = useMemo(() => {
-    return CHANGELOG_DATA.filter((entry) => {
+    return entries.filter((entry) => {
       if (selectedProject !== 'all' && entry.projectName !== selectedProject) return false;
       if (selectedCategory !== 'all' && entry.category !== selectedCategory) return false;
       if (searchQuery.trim()) {
@@ -91,7 +105,7 @@ export const ChangelogPage: React.FC<ChangelogPageProps> = ({ onBack }) => {
 
           <div className="flex items-center gap-2">
             <span className="text-xs font-mono text-slate-500">
-              Total Verified Milestones: <strong>{CHANGELOG_DATA.length}</strong>
+              Total Verified Milestones: <strong>{entries.length}</strong>
             </span>
           </div>
         </div>
