@@ -1,0 +1,224 @@
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Menu, X, ArrowUpRight } from 'lucide-react';
+import { COMPANY_INFO } from '../data/portfolioData';
+
+interface NavbarProps {
+  onOpenContactModal: () => void;
+}
+
+const NAV_LINKS = [
+  { name: 'Home', href: '#hero' },
+  { name: 'Services', href: '#services' },
+  { name: 'Our Work', href: '#work' },
+  { name: 'How We Work', href: '#process' },
+  { name: 'About', href: '#about' },
+  { name: 'Team', href: '#team' },
+  { name: 'Contact', href: '#contact' },
+];
+
+export const Navbar: React.FC<NavbarProps> = ({ onOpenContactModal }) => {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState('hero');
+  const [hoveredLink, setHoveredLink] = useState<string | null>(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 20) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+
+      // Determine active section based on scroll position
+      const scrollPosition = window.scrollY + 120;
+      for (let i = NAV_LINKS.length - 1; i >= 0; i--) {
+        const sectionId = NAV_LINKS[i].href.substring(1);
+        const el = document.getElementById(sectionId);
+        if (el) {
+          const top = el.offsetTop;
+          if (scrollPosition >= top) {
+            setActiveSection(sectionId);
+            break;
+          }
+        }
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Close mobile menu on ESC
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && mobileMenuOpen) {
+        setMobileMenuOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [mobileMenuOpen]);
+
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
+    setMobileMenuOpen(false);
+    const targetId = href.substring(1);
+    const element = document.getElementById(targetId);
+    if (element) {
+      const navOffset = 80;
+      const elementPosition = element.getBoundingClientRect().top + window.scrollY;
+      window.scrollTo({
+        top: elementPosition - navOffset,
+        behavior: 'smooth',
+      });
+    }
+  };
+
+  return (
+    <motion.header
+      initial={{ y: -20, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.45, ease: 'easeOut' }}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        isScrolled
+          ? 'bg-white/95 backdrop-blur-md border-b border-slate-200/90 shadow-soft-sm py-2.5'
+          : 'bg-white/80 backdrop-blur-sm border-b border-slate-100 py-3.5'
+      }`}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between">
+          
+          {/* Logo container: official uploaded logo */}
+          <a
+            href="#hero"
+            onClick={(e) => handleNavClick(e, '#hero')}
+            className="group flex items-center gap-3 transition-opacity duration-200 focus-visible:ring-2 focus-visible:ring-brand-blue rounded-lg p-1 -ml-1"
+            aria-label="SUDHARSHAN_TECH Home"
+          >
+            <div className="relative h-11 sm:h-12 w-auto flex items-center">
+              <img
+                src={COMPANY_INFO.officialLogoUrl}
+                alt="SUDHARSHAN_TECH Official Logo"
+                className="h-full w-auto object-contain transition-transform duration-200 group-hover:scale-[1.02]"
+              />
+            </div>
+          </a>
+
+          {/* Desktop Navigation Links */}
+          <nav className="hidden lg:flex items-center gap-1 xl:gap-2" aria-label="Main navigation">
+            {NAV_LINKS.map((link) => {
+              const sectionId = link.href.substring(1);
+              const isActive = activeSection === sectionId;
+              const isHovered = hoveredLink === link.href;
+
+              return (
+                <a
+                  key={link.name}
+                  href={link.href}
+                  onClick={(e) => handleNavClick(e, link.href)}
+                  onMouseEnter={() => setHoveredLink(link.href)}
+                  onMouseLeave={() => setHoveredLink(null)}
+                  className={`relative px-3 py-2 text-sm font-medium transition-colors duration-200 rounded-md focus-visible:ring-2 focus-visible:ring-brand-blue ${
+                    isActive
+                      ? 'text-brand-blue font-semibold'
+                      : 'text-brand-navy-muted hover:text-brand-blue'
+                  }`}
+                >
+                  {link.name}
+
+                  {/* Active/Hover Animated Underline */}
+                  {(isActive || isHovered) && (
+                    <motion.div
+                      layoutId="navbar-underline"
+                      className="absolute bottom-0 left-2 right-2 h-[2px] bg-brand-blue rounded-full"
+                      transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                    />
+                  )}
+                </a>
+              );
+            })}
+          </nav>
+
+          {/* Far Right: Start a Project CTA Button */}
+          <div className="hidden sm:flex items-center gap-3">
+            <button
+              onClick={onOpenContactModal}
+              className="group relative inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-brand-blue text-white text-sm font-semibold shadow-sm hover:bg-brand-blue-dark active:scale-[0.98] transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-blue cursor-pointer"
+            >
+              <span>Start a Project</span>
+              <ArrowUpRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+            </button>
+          </div>
+
+          {/* Mobile Menu Hamburger Toggle */}
+          <div className="flex sm:hidden items-center gap-2">
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              type="button"
+              className="p-2 rounded-lg text-brand-navy hover:text-brand-blue hover:bg-slate-100 transition-colors focus-visible:ring-2 focus-visible:ring-brand-blue"
+              aria-expanded={mobileMenuOpen}
+              aria-label="Toggle navigation menu"
+            >
+              {mobileMenuOpen ? (
+                <X className="w-6 h-6 text-brand-navy" />
+              ) : (
+                <Menu className="w-6 h-6 text-brand-navy" />
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Drawer Navigation */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.25, ease: 'easeInOut' }}
+            className="lg:hidden border-b border-slate-200 bg-white/98 backdrop-blur-md px-4 pt-3 pb-6 shadow-soft-lg overflow-hidden"
+          >
+            <div className="flex flex-col space-y-1.5 pt-2">
+              {NAV_LINKS.map((link) => {
+                const sectionId = link.href.substring(1);
+                const isActive = activeSection === sectionId;
+                return (
+                  <a
+                    key={link.name}
+                    href={link.href}
+                    onClick={(e) => handleNavClick(e, link.href)}
+                    className={`flex items-center justify-between px-3.5 py-2.5 rounded-lg text-base font-medium transition-colors ${
+                      isActive
+                        ? 'bg-blue-50 text-brand-blue font-semibold'
+                        : 'text-brand-navy hover:bg-slate-50 hover:text-brand-blue'
+                    }`}
+                  >
+                    <span>{link.name}</span>
+                    {isActive && <div className="w-1.5 h-1.5 rounded-full bg-brand-blue" />}
+                  </a>
+                );
+              })}
+
+              <div className="pt-4 mt-2 border-t border-slate-100">
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    onOpenContactModal();
+                  }}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-brand-blue text-white text-base font-semibold shadow-sm hover:bg-brand-blue-dark active:scale-[0.98] transition-all"
+                >
+                  <span>Start a Project</span>
+                  <ArrowUpRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.header>
+  );
+};
