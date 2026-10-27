@@ -7,13 +7,13 @@ import {
   Layout, 
   Cloud, 
   ShieldCheck, 
-  ArrowRight, 
   CheckCircle2, 
   Sparkles,
   ChevronDown,
   ChevronUp
 } from 'lucide-react';
 import { SERVICES_DATA } from '../data/portfolioData';
+import { Button } from './ui/Button';
 
 interface ServicesProps {
   onSelectServiceForInquiry: (serviceName: string) => void;
@@ -162,13 +162,17 @@ export const Services: React.FC<ServicesProps> = ({ onSelectServiceForInquiry })
                     {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
                   </button>
 
-                  <button
+                  <Button
                     onClick={() => onSelectServiceForInquiry(service.title)}
-                    className="group/enq inline-flex items-center gap-1.5 text-xs font-semibold text-brand-blue hover:text-brand-blue-dark transition-colors cursor-pointer"
+                    variant="ghost"
+                    size="sm"
+                    animation="nudge"
+                    nudgeDirection="right"
+                    ariaLabel={`Enquire about ${service.title}`}
+                    className="text-brand-blue hover:text-brand-blue-dark !px-2.5 !py-1"
                   >
-                    <span>Enquire</span>
-                    <ArrowRight className="w-3.5 h-3.5 transition-transform duration-150 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover/enq:translate-x-1" />
-                  </button>
+                    Enquire
+                  </Button>
                 </div>
               </motion.div>
             );

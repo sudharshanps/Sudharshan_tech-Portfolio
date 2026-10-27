@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Users, Mail, Phone, Instagram, Quote, Sparkles } from 'lucide-react';
 import { TEAM_MEMBERS } from '../data/portfolioData';
+import { Button } from './ui/Button';
 
 interface TeamProps {
   onOpenContactModal: () => void;
@@ -164,12 +165,17 @@ export const Team: React.FC<TeamProps> = ({ onOpenContactModal }) => {
                     )}
 
                     <div>
-                      <button
+                      <Button
                         onClick={onOpenContactModal}
-                        className="text-xs font-semibold text-brand-blue hover:text-brand-blue-dark transition-colors cursor-pointer"
+                        variant="ghost"
+                        size="sm"
+                        animation="nudge"
+                        nudgeDirection="right"
+                        ariaLabel="Enquire to collaborate with SUDHARSHAN_TECH"
+                        className="text-brand-blue hover:text-brand-blue-dark !px-2"
                       >
-                        Enquire to Collaborate →
-                      </button>
+                        Enquire to Collaborate
+                      </Button>
                     </div>
                   </div>
 

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ExternalLink, ArrowRight, ShieldCheck, Code2, Eye } from 'lucide-react';
+import { ShieldCheck, Code2, Eye } from 'lucide-react';
 import { PROJECTS_DATA } from '../data/portfolioData';
 import { Project } from '../types';
+import { Button } from './ui/Button';
 
 interface SelectedWorkProps {
   onSelectProject: (project: Project) => void;
@@ -149,25 +150,32 @@ export const SelectedWork: React.FC<SelectedWorkProps> = ({ onSelectProject }) =
 
                   {/* Actions Bar with Micro-Interactions */}
                   <div className="pt-4 border-t border-slate-100 flex items-center justify-between mt-auto">
-                    <button
+                    <Button
                       onClick={() => onSelectProject(project)}
-                      className="group/btn inline-flex items-center gap-1.5 text-xs font-semibold text-brand-navy hover:text-brand-blue transition-colors cursor-pointer"
+                      variant="ghost"
+                      size="sm"
+                      animation="nudge"
+                      nudgeDirection="right"
+                      ariaLabel={`View case details for ${project.title}`}
+                      className="!px-2.5 !py-1 text-brand-navy hover:text-brand-blue"
                     >
-                      <span>Case Details</span>
-                      <ArrowRight className="w-3.5 h-3.5 transition-transform duration-150 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover/btn:translate-x-1" />
-                    </button>
+                      Case Details
+                    </Button>
 
                     {project.liveUrl && (
-                      <a
+                      <Button
                         href={project.liveUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="group/link inline-flex items-center gap-1 text-xs font-semibold text-brand-blue hover:text-brand-blue-dark transition-colors"
-                        title="Open client website"
+                        variant="ghost"
+                        size="sm"
+                        animation="nudge"
+                        nudgeDirection="right"
+                        className="text-brand-blue hover:text-brand-blue-dark !px-2.5 !py-1"
+                        ariaLabel={`Visit live site for ${project.title}`}
                       >
-                        <span>Live Site</span>
-                        <ExternalLink className="w-3 h-3 transition-transform duration-150 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5" />
-                      </a>
+                        Live Site
+                      </Button>
                     )}
                   </div>
                 </div>
