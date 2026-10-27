@@ -164,10 +164,10 @@ export const Services: React.FC<ServicesProps> = ({ onSelectServiceForInquiry })
 
                   <button
                     onClick={() => onSelectServiceForInquiry(service.title)}
-                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-blue hover:text-brand-blue-dark transition-colors cursor-pointer group-hover:translate-x-0.5 duration-200"
+                    className="group/enq inline-flex items-center gap-1.5 text-xs font-semibold text-brand-blue hover:text-brand-blue-dark transition-colors cursor-pointer"
                   >
                     <span>Enquire</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
+                    <ArrowRight className="w-3.5 h-3.5 transition-transform duration-150 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover/enq:translate-x-1" />
                   </button>
                 </div>
               </motion.div>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowUp, Mail, MapPin, Phone, Github, Linkedin } from 'lucide-react';
+import { ArrowUp, Mail, MapPin, Phone, Instagram } from 'lucide-react';
 import { COMPANY_INFO, SERVICES_DATA } from '../data/portfolioData';
 
 export const Footer: React.FC = () => {
@@ -17,7 +17,7 @@ export const Footer: React.FC = () => {
           {/* Brand Info Column */}
           <div className="lg:col-span-2 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="h-12 w-auto bg-white p-1 rounded-lg">
+              <div className="h-12 w-auto bg-white p-1 rounded-xl">
                 <img
                   src={COMPANY_INFO.officialLogoUrl}
                   alt="SUDHARSHAN_TECH Official Logo"
@@ -31,34 +31,38 @@ export const Footer: React.FC = () => {
             </p>
 
             <p className="text-xs sm:text-sm text-slate-400 max-w-sm leading-relaxed">
-              Independent technology company based in Coimbatore, India. Engineering reliable web systems, AI automation, and bespoke software solutions for forward-thinking businesses.
+              Independent technology company founded by Sudharshan.P.S and based in Coimbatore, India. Engineering reliable web systems, AI automation, and bespoke software solutions.
             </p>
 
+            {/* Verified Social & Direct Links */}
             <div className="flex items-center gap-3 pt-2">
               <a
-                href={COMPANY_INFO.linkedinUrl}
+                href={COMPANY_INFO.instagramUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-slate-300 hover:text-white hover:bg-brand-blue transition-colors"
-                aria-label="LinkedIn"
+                className="w-9 h-9 rounded-xl bg-slate-800 flex items-center justify-center text-slate-300 hover:text-white hover:bg-pink-600 transition-colors"
+                aria-label="SUDHARSHAN_TECH Instagram"
+                title="Official Instagram"
               >
-                <Linkedin className="w-4 h-4" />
+                <Instagram className="w-4 h-4" />
               </a>
+
               <a
-                href={COMPANY_INFO.githubUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-slate-300 hover:text-white hover:bg-brand-blue transition-colors"
-                aria-label="GitHub"
-              >
-                <Github className="w-4 h-4" />
-              </a>
-              <a
-                href={`mailto:${COMPANY_INFO.email}`}
-                className="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-slate-300 hover:text-white hover:bg-brand-blue transition-colors"
-                aria-label="Email"
+                href={`mailto:${COMPANY_INFO.email}?subject=Project%20Enquiry%20%E2%80%94%20SUDHARSHAN_TECH`}
+                className="w-9 h-9 rounded-xl bg-slate-800 flex items-center justify-center text-slate-300 hover:text-white hover:bg-brand-blue transition-colors"
+                aria-label="Email Founder"
+                title="Direct Email"
               >
                 <Mail className="w-4 h-4" />
+              </a>
+
+              <a
+                href={`tel:${COMPANY_INFO.phone.replace(/\s+/g, '')}`}
+                className="w-9 h-9 rounded-xl bg-slate-800 flex items-center justify-center text-slate-300 hover:text-white hover:bg-emerald-600 transition-colors"
+                aria-label="Call Founder"
+                title="Direct Phone"
+              >
+                <Phone className="w-4 h-4" />
               </a>
             </div>
           </div>
@@ -121,7 +125,7 @@ export const Footer: React.FC = () => {
           {/* Column 4: Contact & Location */}
           <div className="space-y-3">
             <h4 className="text-xs font-mono uppercase tracking-wider text-slate-300 font-semibold">
-              Coimbatore Hub
+              Founder & Office
             </h4>
             <div className="space-y-2.5 text-xs text-slate-400">
               <div className="flex items-start gap-2">
@@ -130,13 +134,19 @@ export const Footer: React.FC = () => {
               </div>
               <div className="flex items-start gap-2">
                 <Mail className="w-4 h-4 text-brand-blue-glow shrink-0 mt-0.5" />
-                <a href={`mailto:${COMPANY_INFO.email}`} className="hover:text-white transition-colors">
+                <a
+                  href={`mailto:${COMPANY_INFO.email}?subject=Project%20Enquiry%20%E2%80%94%20SUDHARSHAN_TECH`}
+                  className="hover:text-white transition-colors break-all"
+                >
                   {COMPANY_INFO.email}
                 </a>
               </div>
               <div className="flex items-start gap-2">
                 <Phone className="w-4 h-4 text-brand-blue-glow shrink-0 mt-0.5" />
-                <a href={`tel:${COMPANY_INFO.phone}`} className="hover:text-white transition-colors">
+                <a
+                  href={`tel:${COMPANY_INFO.phone.replace(/\s+/g, '')}`}
+                  className="hover:text-white transition-colors"
+                >
                   {COMPANY_INFO.phone}
                 </a>
               </div>
@@ -148,11 +158,11 @@ export const Footer: React.FC = () => {
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 font-mono">
           <div>
-            © {new Date().getFullYear()} SUDHARSHAN_TECH. All rights reserved.
+            © {new Date().getFullYear()} SUDHARSHAN_TECH. All rights reserved. Founded by Sudharshan.P.S.
           </div>
 
           <div className="flex items-center gap-6">
-            <span>Built with React + Vite + TypeScript</span>
+            <span>Engineering Practical Solutions</span>
             <button
               onClick={scrollToTop}
               className="inline-flex items-center gap-1.5 text-slate-400 hover:text-white transition-colors cursor-pointer"

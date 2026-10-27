@@ -1,7 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowUpRight, ChevronRight, Sparkles, Shield, Cpu } from 'lucide-react';
+import { Sparkles, Shield, Cpu } from 'lucide-react';
 import { COMPANY_INFO, STATS_HIGHLIGHTS } from '../data/portfolioData';
+import { Button } from './ui/Button';
 
 interface HeroProps {
   onOpenContactModal: () => void;
@@ -12,7 +13,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenContactModal }) => {
     e.preventDefault();
     const el = document.getElementById('work');
     if (el) {
-      const navOffset = 80;
+      const navOffset = 85;
       const elPosition = el.getBoundingClientRect().top + window.scrollY;
       window.scrollTo({
         top: elPosition - navOffset,
@@ -64,24 +65,30 @@ export const Hero: React.FC<HeroProps> = ({ onOpenContactModal }) => {
               {COMPANY_INFO.mission} From high-performance web systems and computer vision models to bespoke software platforms, we engineer solutions built for real business impact.
             </p>
 
-            {/* Action Buttons */}
+            {/* Action Buttons with Micro-Interactions */}
             <div className="flex flex-wrap items-center gap-4 w-full sm:w-auto">
-              <button
+              <Button
                 onClick={onOpenContactModal}
-                className="group inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-brand-blue text-white font-semibold text-base shadow-sm hover:bg-brand-blue-dark active:scale-[0.98] transition-all duration-200 cursor-pointer"
+                variant="primary"
+                size="lg"
+                animation="fly-through"
+                contextualIcon="phone"
+                ariaLabel="Start a Project with SUDHARSHAN_TECH"
               >
-                <span>Start a Project</span>
-                <ArrowUpRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-              </button>
+                Start a Project
+              </Button>
 
-              <a
+              <Button
                 href="#work"
                 onClick={scrollToWork}
-                className="group inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-brand-navy font-semibold text-base border border-slate-200/90 transition-all duration-200"
+                variant="secondary"
+                size="lg"
+                animation="nudge"
+                nudgeDirection="right"
+                ariaLabel="Explore Our Selected Work"
               >
-                <span>Explore Our Work</span>
-                <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-brand-blue group-hover:translate-x-0.5 transition-all" />
-              </a>
+                Explore Our Work
+              </Button>
             </div>
 
             {/* Trust / Capability Badges */}

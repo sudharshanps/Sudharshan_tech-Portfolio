@@ -2,6 +2,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ExternalLink, CheckCircle, Code, ShieldCheck, Tag } from 'lucide-react';
 import { Project } from '../types';
+import { Button } from './ui/Button';
 
 interface ProjectModalProps {
   project: Project | null;
@@ -30,7 +31,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose, on
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 15 }}
           transition={{ duration: 0.25, ease: 'easeOut' }}
-          className="relative w-full max-w-3xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden z-10 max-h-[90vh] flex flex-col"
+          className="relative w-full max-w-3xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden z-10 max-h-[90vh] flex flex-col"
         >
           {/* Header */}
           <div className="flex items-start justify-between p-6 border-b border-slate-100 bg-slate-50/70">
@@ -55,7 +56,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose, on
 
             <button
               onClick={onClose}
-              className="p-2 rounded-lg text-slate-400 hover:text-brand-navy hover:bg-slate-200/60 transition-colors focus-visible:ring-2 focus-visible:ring-brand-blue"
+              className="p-2 rounded-lg text-slate-400 hover:text-brand-navy hover:bg-slate-200/60 transition-colors focus-visible:ring-2 focus-visible:ring-brand-blue cursor-pointer"
               aria-label="Close modal"
             >
               <X className="w-5 h-5" />
@@ -151,10 +152,10 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose, on
                   href={project.liveUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-blue hover:text-brand-blue-dark transition-colors"
+                  className="group inline-flex items-center gap-1.5 text-xs font-semibold text-brand-blue hover:text-brand-blue-dark transition-colors"
                 >
                   <span>Visit Live Client Site</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
+                  <ExternalLink className="w-3.5 h-3.5 transition-transform duration-150 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                 </a>
               ) : (
                 <span className="text-xs font-mono text-slate-500">
@@ -170,15 +171,19 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose, on
               >
                 Close
               </button>
-              <button
+              <Button
                 onClick={() => {
                   onClose();
                   onStartInquiry();
                 }}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-brand-blue text-white text-xs font-semibold hover:bg-brand-blue-dark transition-colors cursor-pointer"
+                variant="primary"
+                size="sm"
+                animation="fly-through"
+                contextualIcon="phone"
+                ariaLabel="Discuss project"
               >
-                <span>Discuss Similar Project</span>
-              </button>
+                Discuss Similar Project
+              </Button>
             </div>
           </div>
 

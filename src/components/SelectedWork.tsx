@@ -70,7 +70,7 @@ export const SelectedWork: React.FC<SelectedWorkProps> = ({ onSelectProject }) =
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-40px' }}
                 transition={{ duration: 0.45, delay: index * 0.07 }}
-                className="group relative flex flex-col justify-between bg-white rounded-2xl border border-slate-200 shadow-soft-sm hover:border-brand-blue/50 hover:shadow-soft-lg transition-all duration-300 overflow-hidden"
+                className="group relative flex flex-col justify-between bg-white rounded-3xl border border-slate-200 shadow-soft-sm hover:border-brand-blue/50 hover:shadow-soft-lg transition-all duration-300 overflow-hidden"
               >
                 {/* Visual Header / Preview Banner */}
                 <div className="relative h-44 bg-gradient-to-br from-slate-900 via-brand-navy to-slate-950 p-5 flex flex-col justify-between text-white border-b border-slate-800">
@@ -147,14 +147,14 @@ export const SelectedWork: React.FC<SelectedWorkProps> = ({ onSelectProject }) =
                     </div>
                   </div>
 
-                  {/* Actions Bar */}
+                  {/* Actions Bar with Micro-Interactions */}
                   <div className="pt-4 border-t border-slate-100 flex items-center justify-between mt-auto">
                     <button
                       onClick={() => onSelectProject(project)}
-                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-navy hover:text-brand-blue transition-colors cursor-pointer"
+                      className="group/btn inline-flex items-center gap-1.5 text-xs font-semibold text-brand-navy hover:text-brand-blue transition-colors cursor-pointer"
                     >
                       <span>Case Details</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
+                      <ArrowRight className="w-3.5 h-3.5 transition-transform duration-150 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover/btn:translate-x-1" />
                     </button>
 
                     {project.liveUrl && (
@@ -162,11 +162,11 @@ export const SelectedWork: React.FC<SelectedWorkProps> = ({ onSelectProject }) =
                         href={project.liveUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-xs font-medium text-brand-blue hover:text-brand-blue-dark transition-colors"
+                        className="group/link inline-flex items-center gap-1 text-xs font-semibold text-brand-blue hover:text-brand-blue-dark transition-colors"
                         title="Open client website"
                       >
                         <span>Live Site</span>
-                        <ExternalLink className="w-3 h-3" />
+                        <ExternalLink className="w-3 h-3 transition-transform duration-150 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5" />
                       </a>
                     )}
                   </div>

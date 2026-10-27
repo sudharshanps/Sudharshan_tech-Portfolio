@@ -33,14 +33,19 @@ export interface ServiceItem {
 export interface TeamMember {
   id: string;
   name: string;
+  designation: string;
   role: string;
   company: string;
   tagline: string;
   description: string;
+  quote?: string;
   image: string;
   altText: string;
   isSpotlight?: boolean;
   highlights: string[];
+  email?: string;
+  phone?: string;
+  instagramUrl?: string;
 }
 
 export interface ProcessStep {
@@ -53,10 +58,11 @@ export interface ProcessStep {
 
 export interface InquiryFormData {
   fullName: string;
+  company?: string;
   email: string;
-  company: string;
+  phone?: string;
   serviceType: string;
-  budgetRange: string;
-  timeline: string;
+  budgetRange?: string;
+  timeline?: string;
   projectDetails: string;
 }

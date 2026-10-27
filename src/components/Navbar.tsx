@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, ArrowUpRight } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { COMPANY_INFO } from '../data/portfolioData';
+import { Button } from './ui/Button';
 
 interface NavbarProps {
   onOpenContactModal: () => void;
@@ -32,7 +33,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenContactModal }) => {
       }
 
       // Determine active section based on scroll position
-      const scrollPosition = window.scrollY + 120;
+      const scrollPosition = window.scrollY + 140;
       for (let i = NAV_LINKS.length - 1; i >= 0; i--) {
         const sectionId = NAV_LINKS[i].href.substring(1);
         const el = document.getElementById(sectionId);
@@ -68,7 +69,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenContactModal }) => {
     const targetId = href.substring(1);
     const element = document.getElementById(targetId);
     if (element) {
-      const navOffset = 80;
+      const navOffset = 85;
       const elementPosition = element.getBoundingClientRect().top + window.scrollY;
       window.scrollTo({
         top: elementPosition - navOffset,
@@ -142,15 +143,18 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenContactModal }) => {
             })}
           </nav>
 
-          {/* Far Right: Start a Project CTA Button */}
+          {/* Far Right: Start a Project CTA Button with Arrow Fly-Through Micro-Interaction */}
           <div className="hidden sm:flex items-center gap-3">
-            <button
+            <Button
               onClick={onOpenContactModal}
-              className="group relative inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-brand-blue text-white text-sm font-semibold shadow-sm hover:bg-brand-blue-dark active:scale-[0.98] transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-blue cursor-pointer"
+              variant="primary"
+              size="md"
+              animation="fly-through"
+              contextualIcon="phone"
+              ariaLabel="Start a project with SUDHARSHAN_TECH"
             >
-              <span>Start a Project</span>
-              <ArrowUpRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-            </button>
+              Start a Project
+            </Button>
           </div>
 
           {/* Mobile Menu Hamburger Toggle */}
@@ -204,16 +208,19 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenContactModal }) => {
               })}
 
               <div className="pt-4 mt-2 border-t border-slate-100">
-                <button
+                <Button
                   onClick={() => {
                     setMobileMenuOpen(false);
                     onOpenContactModal();
                   }}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-brand-blue text-white text-base font-semibold shadow-sm hover:bg-brand-blue-dark active:scale-[0.98] transition-all"
+                  variant="primary"
+                  size="lg"
+                  animation="fly-through"
+                  contextualIcon="phone"
+                  className="w-full"
                 >
-                  <span>Start a Project</span>
-                  <ArrowUpRight className="w-4 h-4" />
-                </button>
+                  Start a Project
+                </Button>
               </div>
             </div>
           </motion.div>
