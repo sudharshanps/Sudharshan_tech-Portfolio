@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ExternalLink, CheckCircle, Code, ShieldCheck, Tag, Layers } from 'lucide-react';
+import { X, ExternalLink, CheckCircle, Code, ShieldCheck, Tag, Layers, Activity, Milestone } from 'lucide-react';
 import { Project } from '../types';
 import { Button } from './ui/Button';
 
@@ -91,6 +91,50 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose, on
                 </p>
               </div>
             )}
+
+            {/* Project Pulse & Verified Live State */}
+            <div className="p-4 rounded-xl bg-slate-900 text-white border border-slate-800 shadow-sm space-y-2.5">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-2">
+                <div className="flex items-center gap-2">
+                  <Activity className="w-4 h-4 text-brand-blue-glow" />
+                  <span className="text-xs font-mono font-bold tracking-wider uppercase text-slate-200">
+                    Project Pulse & Engineering Status
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-mono text-slate-400">Last Verified:</span>
+                  <span className="text-xs font-mono text-slate-200">{project.lastUpdated}</span>
+                  <span
+                    className={`px-2 py-0.5 rounded text-[10px] font-mono font-semibold uppercase ${
+                      project.pulseStage === 'Deployed'
+                        ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/30'
+                        : project.pulseStage === 'Prototype'
+                        ? 'bg-blue-500/20 text-blue-300 border border-blue-400/30'
+                        : project.pulseStage === 'Research'
+                        ? 'bg-purple-500/20 text-purple-300 border border-purple-400/30'
+                        : 'bg-amber-500/20 text-amber-300 border border-amber-400/30'
+                    }`}
+                  >
+                    ● {project.pulseStage}
+                  </span>
+                </div>
+              </div>
+
+              <div className="text-xs text-slate-300 leading-relaxed font-mono">
+                <strong className="text-white">Active Status: </strong>
+                {project.pulseNote}
+              </div>
+
+              {project.nextMilestone && (
+                <div className="flex items-start gap-1.5 text-xs text-slate-400 pt-1 border-t border-slate-800/80 font-mono">
+                  <Milestone className="w-3.5 h-3.5 text-brand-blue-glow shrink-0 mt-0.5" />
+                  <span>
+                    <strong className="text-slate-300">Next Milestone: </strong>
+                    {project.nextMilestone}
+                  </span>
+                </div>
+              )}
+            </div>
 
             {/* Highlights banner */}
             {project.metricsOrHighlight && (

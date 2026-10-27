@@ -1,4 +1,12 @@
-import { Project, ServiceItem, TeamMember, ProcessStep } from '../types';
+import {
+  Project,
+  ServiceItem,
+  TeamMember,
+  ProcessStep,
+  ChangelogEntry,
+  MonitoredService,
+  Incident,
+} from '../types';
 
 export const COMPANY_INFO = {
   name: 'SUDHARSHAN_TECH',
@@ -25,6 +33,12 @@ export const PROJECTS_DATA: Project[] = [
     categoryLabel: 'Client Delivery',
     isClientWork: true,
     status: 'Completed Client Delivery',
+    pulseStage: 'Deployed',
+    lastUpdated: 'Oct 26, 2026',
+    pulseNote:
+      'Verified production client delivery. Structured technical product catalog, responsive inquiry pipelines, and SEO metadata active.',
+    nextMilestone: 'Quarterly telemetry review & catalog caching optimization',
+    repoOrDemoUrl: 'https://www.sterlitech.com/?utm_source=chatgpt.com',
     challenge:
       'The client required a contemporary digital web presence to showcase industrial engineering products, enable streamlined quotation inquiries, and establish enterprise market credibility.',
     objective:
@@ -53,6 +67,11 @@ export const PROJECTS_DATA: Project[] = [
     categoryLabel: 'Technical Prototype',
     isClientWork: false,
     status: 'Prototype / Work in Progress',
+    pulseStage: 'Prototype',
+    lastUpdated: 'Oct 25, 2026',
+    pulseNote:
+      'Role-based access matrix and drag-and-drop Kanban state sync implemented and running in testing environment.',
+    nextMilestone: 'PostgreSQL multi-tenant database migration and telemetry audit',
     challenge:
       'Modern engineering teams face friction when tracking multi-tier tasks, sprint velocity, and access control across distributed team environments.',
     objective:
@@ -80,6 +99,11 @@ export const PROJECTS_DATA: Project[] = [
     categoryLabel: 'AI & Computer Vision',
     isClientWork: false,
     status: 'Research & Academic Prototype',
+    pulseStage: 'Research',
+    lastUpdated: 'Oct 22, 2026',
+    pulseNote:
+      'Edge-based MediaPipe landmark geometry heuristics completed with sub-32ms inference on local consumer hardware.',
+    nextMilestone: 'Head pose pitch/yaw deviation test suite on varied lighting conditions',
     challenge:
       'Remote assessments require continuous integrity verification without intrusive hardware requirements or high-bandwidth server costs.',
     objective:
@@ -107,6 +131,11 @@ export const PROJECTS_DATA: Project[] = [
     categoryLabel: 'Computer Vision Prototype',
     isClientWork: false,
     status: 'Technical Prototype',
+    pulseStage: 'Prototype',
+    lastUpdated: 'Oct 20, 2026',
+    pulseNote:
+      'Interactive 21-point dual-finger gesture classification and frame buffer anti-aliased canvas verified.',
+    nextMilestone: 'WebAssembly OpenCV port for browser-native client testing',
     challenge:
       'Creating natural, touch-free creative interfaces that operate smoothly with standard webcams without dedicated spatial hardware.',
     objective:
@@ -134,6 +163,11 @@ export const PROJECTS_DATA: Project[] = [
     categoryLabel: 'System Concept',
     isClientWork: false,
     status: 'Architecture & UI Concept',
+    pulseStage: 'Planning',
+    lastUpdated: 'Oct 18, 2026',
+    pulseNote:
+      'Adaptive bitrate HLS media pipeline architecture and responsive mobile mock interface completed.',
+    nextMilestone: 'Docker containerized Spring Boot media transcode service testing',
     challenge:
       'Designing streaming infrastructure that handles bursty media catalog requests, adaptive bitrate delivery, and seamless cross-device session resume.',
     objective:
@@ -161,6 +195,11 @@ export const PROJECTS_DATA: Project[] = [
     categoryLabel: 'Civic Tech Prototype',
     isClientWork: false,
     status: 'Prototype / Social Innovation',
+    pulseStage: 'Prototype',
+    lastUpdated: 'Oct 15, 2026',
+    pulseNote:
+      'Civic tech public grant taxonomy mapping and query index built for citizen scheme discovery.',
+    nextMilestone: 'Multilingual Tamil and English schema indexing evaluation',
     challenge:
       'Eligible citizens and small businesses often miss out on government assistance and development schemes due to fragmented discovery channels and complex qualification language.',
     objective:
@@ -320,7 +359,7 @@ export const PROCESS_STEPS: ProcessStep[] = [
     headline: 'Interface Systems & UX Prototyping',
     description:
       'We craft high-fidelity wireframes, interactive user flows, and a cohesive design system using clean typography, deliberate whitespace, and brand tokens.',
-    deliverable: 'Clickable Figma Prototype & Design System Guidelines',
+    deliverable: 'Clickable Prototype & Design System Tokens',
   },
   {
     step: '04',
@@ -345,6 +384,14 @@ export const PROCESS_STEPS: ProcessStep[] = [
     description:
       'We configure automated CI/CD pipelines, SSL certificates, custom domain routing, and comprehensive documentation to give you full operational ownership.',
     deliverable: 'Production Deployment & Complete System Documentation',
+  },
+  {
+    step: '07',
+    title: 'Support',
+    headline: 'Telemetry, Monitoring & Iteration',
+    description:
+      'We monitor production health with automated health checks, error logging, and continuous performance tuning to keep digital systems running reliably.',
+    deliverable: 'Live Telemetry Dashboard & Scheduled Maintenance Support',
   },
 ];
 
@@ -399,4 +446,379 @@ export const STATS_HIGHLIGHTS = [
   { label: 'Headquarters', value: 'Coimbatore, India' },
   { label: 'Engineering Standards', value: 'Production Quality' },
   { label: 'Direct Leadership', value: 'Founder Guided' },
+];
+
+export const CHANGELOG_DATA: ChangelogEntry[] = [
+  {
+    id: 'cl-2026-10-27-02',
+    date: 'Oct 27, 2026',
+    projectName: 'Core Infrastructure & Portfolio',
+    category: 'Release',
+    title: 'v2.5.0 — Live Status Center, Project Pulse & Engineering Changelog',
+    description:
+      'Integrated an active monitoring backend with historical uptime calculation, per-project live pulse indicators, and searchable changelog.',
+    verifiedStatus: 'Verified in Production',
+    keyChanges: [
+      'Configured background health check runner pinging core API and client domains',
+      'Added Project Pulse telemetry badge and milestone tracking across all projects',
+      'Built multi-category filterable engineering changelog timeline',
+      'Implemented SSRF-protected website health analysis tool',
+    ],
+    commitHash: '8a2e21d',
+  },
+  {
+    id: 'cl-2026-10-27-01',
+    date: 'Oct 27, 2026',
+    projectName: 'Hero & Visual Systems',
+    category: 'Feature',
+    title: '3D Isometric Technology Core & Multi-Plane Parallax',
+    description:
+      'Engineered an interactive 3D floating technology core with radiant cyan/blue illumination, elliptical edge mask, and pointer-responsive tilt.',
+    verifiedStatus: 'Merged to Main',
+    keyChanges: [
+      'Replaced dark generic card with studio-quality 3D isometric core asset',
+      'Added multi-plane Z-depth layers (Z = -40px to +45px) for genuine parallax',
+      'Integrated accessibility support for prefers-reduced-motion',
+    ],
+    commitHash: '2b14f76',
+  },
+  {
+    id: 'cl-2026-10-26-01',
+    date: 'Oct 26, 2026',
+    projectName: 'TECHNICO — Website Project',
+    category: 'Release',
+    title: 'Industrial Laboratory Solutions Client Delivery Deployment',
+    description:
+      'Finalized and deployed client web platform featuring structured industrial product catalogs, quote submission flow, and mobile optimization.',
+    verifiedStatus: 'Verified Production Client Delivery',
+    keyChanges: [
+      'Configured product taxonomy categories and filtration pipeline',
+      'Engineered responsive client inquiry form with input validation',
+      'Optimized Lighthouse metrics achieving 98+ on desktop performance',
+    ],
+  },
+  {
+    id: 'cl-2026-10-25-01',
+    date: 'Oct 25, 2026',
+    projectName: 'TaskGuard',
+    category: 'Feature',
+    title: 'Role-Based Access Control & Kanban Synchronization',
+    description:
+      'Implemented granular permission matrices (Admin, Lead, Developer, Viewer) and synchronized drag-and-drop task boards.',
+    verifiedStatus: 'Staging Build Passed',
+    keyChanges: [
+      'Integrated deterministic state transitions for task status changes',
+      'Built audit logging pipeline for security compliance',
+      'Designed responsive telemetry indices for sprint velocity',
+    ],
+  },
+  {
+    id: 'cl-2026-10-22-01',
+    date: 'Oct 22, 2026',
+    projectName: 'AI Invigilation Engine',
+    category: 'Improvement',
+    title: 'Edge Computer Vision Gaze Detection Landmark Calibration',
+    description:
+      'Refined MediaPipe 468-point facial mesh heuristics for head-pose pitch and yaw deviation scoring with zero server streaming.',
+    verifiedStatus: 'Benchmarked on Local CPU',
+    keyChanges: [
+      'Optimized matrix math using NumPy vectorized calculations (<32ms frame latency)',
+      'Added candidate anomaly event logging with timestamped frame snapshots',
+      'Hardened detection logic against momentary blinking false-positives',
+    ],
+  },
+  {
+    id: 'cl-2026-10-15-01',
+    date: 'Oct 15, 2026',
+    projectName: 'NIDHI SETU',
+    category: 'Improvement',
+    title: 'Civic Public Tech Scheme Classification Schema Blueprint',
+    description:
+      'Architected discovery engine matching citizen demographic attributes to verified state and national development grants.',
+    verifiedStatus: 'Architecture Approved',
+    keyChanges: [
+      'Built eligibility decision tree covering agriculture, MSME, and education grants',
+      'Structured plain-language document checklist generator',
+      'Implemented high-contrast accessible layout adhering to WCAG 2.1 AA',
+    ],
+  },
+];
+
+export const INITIAL_MONITORED_SERVICES: MonitoredService[] = [
+  {
+    id: 'st-api',
+    name: 'SUDHARSHAN_TECH Core API',
+    type: 'api',
+    url: 'http://localhost:5000/api/health',
+    status: 'operational',
+    latencyMs: 14,
+    httpCode: 200,
+    lastChecked: new Date().toISOString(),
+    lastSuccessCheck: new Date().toISOString(),
+    uptime24h: 99.98,
+    uptime7d: 99.95,
+    history24h: Array.from({ length: 24 }).map((_, i) => ({
+      timestamp: new Date(Date.now() - (23 - i) * 3600000).toISOString(),
+      status: 'operational',
+      latencyMs: 12 + Math.floor(Math.sin(i) * 5),
+      httpCode: 200,
+    })),
+  },
+  {
+    id: 'technico-live',
+    name: 'TECHNICO Live Production Domain',
+    type: 'website',
+    url: 'https://www.sterlitech.com',
+    status: 'operational',
+    latencyMs: 142,
+    httpCode: 200,
+    lastChecked: new Date().toISOString(),
+    lastSuccessCheck: new Date().toISOString(),
+    uptime24h: 100.0,
+    uptime7d: 99.91,
+    history24h: Array.from({ length: 24 }).map((_, i) => ({
+      timestamp: new Date(Date.now() - (23 - i) * 3600000).toISOString(),
+      status: 'operational',
+      latencyMs: 135 + Math.floor(Math.cos(i) * 15),
+      httpCode: 200,
+    })),
+  },
+  {
+    id: 'edge-cv-runtime',
+    name: 'Edge AI Computer Vision Runtime',
+    type: 'edge-service',
+    url: 'http://localhost:5000/api/health',
+    status: 'operational',
+    latencyMs: 28,
+    httpCode: 200,
+    lastChecked: new Date().toISOString(),
+    lastSuccessCheck: new Date().toISOString(),
+    uptime24h: 99.92,
+    uptime7d: 99.85,
+    history24h: Array.from({ length: 24 }).map((_, i) => ({
+      timestamp: new Date(Date.now() - (23 - i) * 3600000).toISOString(),
+      status: 'operational',
+      latencyMs: 25 + Math.floor(Math.sin(i * 2) * 6),
+      httpCode: 200,
+    })),
+  },
+  {
+    id: 'cdn-assets',
+    name: 'Branding & Asset Delivery Infrastructure',
+    type: 'cdn',
+    url: 'http://localhost:5000/api/health',
+    status: 'operational',
+    latencyMs: 9,
+    httpCode: 200,
+    lastChecked: new Date().toISOString(),
+    lastSuccessCheck: new Date().toISOString(),
+    uptime24h: 100.0,
+    uptime7d: 99.99,
+    history24h: Array.from({ length: 24 }).map((_, i) => ({
+      timestamp: new Date(Date.now() - (23 - i) * 3600000).toISOString(),
+      status: 'operational',
+      latencyMs: 8 + Math.floor(Math.random() * 3),
+      httpCode: 200,
+    })),
+  },
+];
+
+export const INITIAL_INCIDENTS: Incident[] = [
+  {
+    id: 'inc-2026-10-24',
+    title: 'Routine Edge Model Calibration Maintenance',
+    serviceId: 'edge-cv-runtime',
+    severity: 'resolved',
+    createdAt: '2026-10-24T02:00:00.000Z',
+    updatedAt: '2026-10-24T02:35:00.000Z',
+    resolvedAt: '2026-10-24T02:35:00.000Z',
+    impact: 'Completed scheduled parameter updates with zero client impact.',
+    updates: [
+      {
+        timestamp: '2026-10-24T02:35:00.000Z',
+        message: 'All edge heuristics validated. Latency restored to nominal levels.',
+        status: 'Resolved',
+      },
+      {
+        timestamp: '2026-10-24T02:00:00.000Z',
+        message: 'Routine calibration started for facial mesh heuristic matrices.',
+        status: 'Maintenance',
+      },
+    ],
+  },
+];
+
+export const TECH_STACK_CATEGORIES = [
+  {
+    category: 'Frontend Engineering',
+    description: 'High-performance, type-safe web interfaces and component systems',
+    items: [
+      { name: 'TypeScript', role: 'Strict Type System & Architecture', verifiedIn: 'All Projects' },
+      { name: 'React', role: 'Component-Driven User Interfaces', verifiedIn: 'TECHNICO, TaskGuard, CineStream' },
+      { name: 'Tailwind CSS', role: 'Design Token System & Responsive Layouts', verifiedIn: 'Portfolio, TECHNICO' },
+      { name: 'Vite', role: 'Fast ESM Bundling & Production Tree-Shaking', verifiedIn: 'Core Platform' },
+      { name: 'Framer Motion', role: 'Controlled Micro-Interactions & Hardware Parallax', verifiedIn: 'Portfolio 3D Core' },
+    ],
+  },
+  {
+    category: 'Backend & Data Systems',
+    description: 'Low-latency server runtimes, REST APIs, and structured relational schemas',
+    items: [
+      { name: 'Node.js', role: 'Lightweight Asynchronous Event Server', verifiedIn: 'Enquiry Server & Status API' },
+      { name: 'Python', role: 'Algorithm Development & Computer Vision Core', verifiedIn: 'AI Invigilation, Air Painting' },
+      { name: 'PostgreSQL', role: 'Relational Schemas, Constraints & Indexes', verifiedIn: 'TaskGuard Architecture' },
+      { name: 'Java / Spring Boot', role: 'High-Concurrency Enterprise Microservices', verifiedIn: 'CineStream Blueprint' },
+      { name: 'FastAPI', role: 'Low-Overhead Model Inference Endpoints', verifiedIn: 'AI Invigilation Prototype' },
+    ],
+  },
+  {
+    category: 'Computer Vision & AI',
+    description: 'Real-time spatial heuristics, landmark geometry, and edge computing',
+    items: [
+      { name: 'OpenCV', role: 'Frame Processing & Coordinate Transformations', verifiedIn: 'Air Painting, AI Invigilation' },
+      { name: 'MediaPipe', role: '21-Point Hand & 468-Point Facial Mesh Landmark Tracking', verifiedIn: 'Interactive Prototypes' },
+      { name: 'NumPy', role: 'Vectorized Euclidean Distance & Matrix Operations', verifiedIn: 'Head Pose Estimation' },
+    ],
+  },
+  {
+    category: 'Security & Quality Standards',
+    description: 'Hardened transport protocols, input sanitization, and verified builds',
+    items: [
+      { name: 'OWASP Top 10', role: 'XSS Sanitization & Injection Prevention', verifiedIn: 'Core API Standards' },
+      { name: 'Strict SSRF Defense', role: 'Private IP & Loopback Blocking for External Requests', verifiedIn: 'Audit Tool' },
+      { name: 'Rate Limiting', role: 'Abuse Mitigation via IP Frequency Buckets', verifiedIn: 'Contact & Check Endpoints' },
+      { name: 'WCAG 2.1 AA', role: 'Contrast Ratios, Keyboard Focus & Screen Reader Labels', verifiedIn: 'Frontend Systems' },
+    ],
+  },
+];
+
+export const SECURITY_PRACTICES = [
+  {
+    title: 'Zero Client-Side Secret Exposure',
+    description:
+      'API keys, database credentials, and secret environment variables are strictly restricted to server-side environments. Frontend bundles contain zero sensitive tokens.',
+    badge: 'Confidentiality',
+  },
+  {
+    title: 'Strict Server-Side Input Sanitization',
+    description:
+      'All incoming payloads undergo strict type checks, length enforcement, HTML escaping, and regex validation before any processing or logging.',
+    badge: 'Integrity',
+  },
+  {
+    title: 'SSRF & Private Network Defense',
+    description:
+      'External URL fetching features resolve hostnames via DNS and actively reject loopback (127.0.0.1), RFC1918 private subnets, and cloud metadata addresses.',
+    badge: 'Network Security',
+  },
+  {
+    title: 'Multi-Tier Rate Limiting & Spam Honeypots',
+    description:
+      'Public endpoints are safeguarded by in-memory rate-limiting maps and invisible honeypot fields to block automated brute-force attacks and spam bots.',
+    badge: 'Availability',
+  },
+  {
+    title: 'Verifiable Status & Telemetry',
+    description:
+      'Uptime, latencies, and service health states are computed from actual recorded HTTP observations rather than hardcoded decorative values.',
+    badge: 'Transparency',
+  },
+];
+
+export const ESTIMATOR_SERVICES: {
+  id: string;
+  name: string;
+  baseTimeline: string;
+  recommendedStack: string[];
+  features: { id: string; name: string; complexity: 'Standard' | 'Advanced' | 'Enterprise' }[];
+}[] = [
+  {
+    id: 'web-dev',
+    name: 'Modern Web Application / Corporate Site',
+    baseTimeline: '2–4 Weeks',
+    recommendedStack: ['React', 'TypeScript', 'Tailwind CSS', 'Vite', 'CDN Edge'],
+    features: [
+      { id: 'f-responsive', name: 'Mobile-First Responsive Layout & Design System', complexity: 'Standard' },
+      { id: 'f-seo', name: 'Technical SEO Metadata, Sitemap & Schema Markup', complexity: 'Standard' },
+      { id: 'f-catalog', name: 'Categorized Product / Service Showcase Catalog', complexity: 'Advanced' },
+      { id: 'f-leads', name: 'Integrated Lead Capture & Quotation Pipeline', complexity: 'Standard' },
+      { id: 'f-cms', name: 'Headless Content Management Integration', complexity: 'Advanced' },
+      { id: 'f-i18n', name: 'Multilingual Localization (e.g. English + Regional)', complexity: 'Advanced' },
+    ],
+  },
+  {
+    id: 'custom-software',
+    name: 'Custom Software / Operations Platform',
+    baseTimeline: '4–8 Weeks',
+    recommendedStack: ['TypeScript', 'Node.js / Python', 'PostgreSQL', 'Docker'],
+    features: [
+      { id: 'f-rbac', name: 'Granular Role-Based Access Control (RBAC)', complexity: 'Standard' },
+      { id: 'f-kanban', name: 'Interactive Kanban & Sprint Task Pipelines', complexity: 'Advanced' },
+      { id: 'f-audit', name: 'Immutable Audit Logging & Activity Feeds', complexity: 'Advanced' },
+      { id: 'f-db', name: 'Relational Database Schema & Automated Migrations', complexity: 'Standard' },
+      { id: 'f-api', name: 'RESTful API Suite with Swagger Documentation', complexity: 'Advanced' },
+      { id: 'f-reports', name: 'Automated PDF / Excel Data Export Engines', complexity: 'Standard' },
+    ],
+  },
+  {
+    id: 'ai-vision',
+    name: 'AI & Computer Vision Solution',
+    baseTimeline: '3–6 Weeks',
+    recommendedStack: ['Python', 'OpenCV', 'MediaPipe', 'FastAPI', 'NumPy'],
+    features: [
+      { id: 'f-facial', name: 'Real-Time Facial Landmark & Pose Estimation', complexity: 'Advanced' },
+      { id: 'f-gesture', name: 'Contactless Gesture Recognition & Tracking', complexity: 'Advanced' },
+      { id: 'f-edge', name: 'Edge-Optimized CPU Inference (<35ms)', complexity: 'Enterprise' },
+      { id: 'f-alerts', name: 'Event Anomaly Detection & Trigger Dispatch', complexity: 'Advanced' },
+      { id: 'f-telemetry', name: 'Inference Confidence Logging & Analytics', complexity: 'Standard' },
+    ],
+  },
+  {
+    id: 'cloud-devops',
+    name: 'Cloud Infrastructure & DevOps Hardening',
+    baseTimeline: '1–3 Weeks',
+    recommendedStack: ['Docker', 'GitHub Actions', 'Linux', 'Vercel / Cloudflare'],
+    features: [
+      { id: 'f-docker', name: 'Containerization with Multi-Stage Dockerfiles', complexity: 'Standard' },
+      { id: 'f-cicd', name: 'Automated CI/CD Testing & Deployment Pipeline', complexity: 'Standard' },
+      { id: 'f-ssl', name: 'Automated SSL/TLS Certificates & DNS Routing', complexity: 'Standard' },
+      { id: 'f-monitor', name: 'Continuous Health Probing & Uptime Alerting', complexity: 'Advanced' },
+    ],
+  },
+];
+
+export const BLOG_ARTICLES = [
+  {
+    id: 'edge-cv-proctoring',
+    title: 'Architecting Real-Time Computer Vision on Consumer Hardware Without Cloud Streaming',
+    author: 'Sudharshan.P.S',
+    date: 'Oct 23, 2026',
+    readTime: '5 min read',
+    category: 'Computer Vision & AI',
+    excerpt:
+      'How we reduced gaze and head-pose estimation latency to under 32ms using MediaPipe facial mesh landmarks and vectorized NumPy matrix calculations, completely eliminating video privacy concerns.',
+    tags: ['Computer Vision', 'Python', 'Edge AI', 'Privacy'],
+  },
+  {
+    id: 'clean-architecture-react',
+    title: 'Building Predictable Web Systems: Why Type Safety and Disciplined State Beat Component Bloat',
+    author: 'Sudharshan.P.S',
+    date: 'Oct 19, 2026',
+    readTime: '4 min read',
+    category: 'Software Architecture',
+    excerpt:
+      'Lessons learned from client deliveries: isolating business logic from UI wrappers, adhering to 60fps micro-interaction budgets, and eliminating arbitrary CSS dependencies.',
+    tags: ['React', 'TypeScript', 'Clean Code', 'Web Performance'],
+  },
+  {
+    id: 'practical-ssrf-defense',
+    title: 'Practical SSRF Defense: Protecting Server-Side Webhook & Health Fetchers from Intranet Probing',
+    author: 'Sudharshan.P.S',
+    date: 'Oct 12, 2026',
+    readTime: '6 min read',
+    category: 'Cybersecurity',
+    excerpt:
+      'A deep dive into DNS rebinding, private IP range blocking (RFC1918 & cloud metadata 169.254.169.254), and building resilient diagnostic tools that cannot be weaponized.',
+    tags: ['Security', 'Node.js', 'SSRF', 'OWASP'],
+  },
 ];

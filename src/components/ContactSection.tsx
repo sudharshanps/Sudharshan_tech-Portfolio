@@ -1,14 +1,20 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, Phone, MapPin, CheckCircle2, Clock, Instagram, AlertCircle } from 'lucide-react';
+import { Mail, Phone, MapPin, CheckCircle2, Clock, Instagram, AlertCircle, Calculator, Calendar } from 'lucide-react';
 import { COMPANY_INFO, SERVICES_DATA } from '../data/portfolioData';
 import { Button } from './ui/Button';
 
 interface ContactSectionProps {
   preselectedService?: string;
+  onOpenEstimator?: () => void;
+  onOpenScheduler?: () => void;
 }
 
-export const ContactSection: React.FC<ContactSectionProps> = ({ preselectedService = '' }) => {
+export const ContactSection: React.FC<ContactSectionProps> = ({
+  preselectedService = '',
+  onOpenEstimator,
+  onOpenScheduler,
+}) => {
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -249,6 +255,35 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ preselectedServi
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-5">
                   
+                  {/* Quick Entry Pathways */}
+                  {(onOpenEstimator || onOpenScheduler) && (
+                    <div className="flex flex-wrap items-center justify-between gap-2 p-2.5 bg-slate-50 rounded-xl border border-slate-200">
+                      <span className="text-[11px] font-mono text-slate-500 font-medium">Alternative Pathways:</span>
+                      <div className="flex items-center gap-2">
+                        {onOpenEstimator && (
+                          <button
+                            type="button"
+                            onClick={onOpenEstimator}
+                            className="px-2.5 py-1 rounded-lg bg-white border border-slate-200 text-xs font-mono text-brand-navy hover:text-brand-blue hover:border-brand-blue flex items-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
+                          >
+                            <Calculator className="w-3.5 h-3.5 text-brand-blue" />
+                            <span>Smart Estimator</span>
+                          </button>
+                        )}
+                        {onOpenScheduler && (
+                          <button
+                            type="button"
+                            onClick={onOpenScheduler}
+                            className="px-2.5 py-1 rounded-lg bg-white border border-slate-200 text-xs font-mono text-brand-navy hover:text-brand-blue hover:border-brand-blue flex items-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
+                          >
+                            <Calendar className="w-3.5 h-3.5 text-brand-blue" />
+                            <span>Book Discovery Session</span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
                   {/* Spam honeypot (hidden from real users) */}
                   <input
                     type="text"

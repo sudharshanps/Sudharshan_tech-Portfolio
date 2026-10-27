@@ -143,9 +143,30 @@ export const SelectedWork: React.FC<SelectedWorkProps> = ({ onSelectProject }) =
                     {/* Card Body */}
                     <div className="p-4 sm:p-5 flex flex-col flex-1 justify-between">
                       <div>
-                        <h3 className="text-base font-bold text-brand-navy mb-1.5">
-                          {project.title}
-                        </h3>
+                        <div className="flex items-center justify-between gap-2 mb-1">
+                          <h3 className="text-base font-bold text-brand-navy truncate">
+                            {project.title}
+                          </h3>
+                        </div>
+
+                        {/* Project Pulse Telemetry Badge */}
+                        <div className="flex items-center justify-between py-1 px-2 mb-2.5 rounded-md bg-slate-50 border border-slate-200/70 text-[10.5px] font-mono">
+                          <div className="flex items-center gap-1.5">
+                            <span
+                              className={`w-1.5 h-1.5 rounded-full ${
+                                project.pulseStage === 'Deployed'
+                                  ? 'bg-emerald-500'
+                                  : project.pulseStage === 'Prototype'
+                                  ? 'bg-blue-500 animate-pulse'
+                                  : project.pulseStage === 'Research'
+                                  ? 'bg-purple-500'
+                                  : 'bg-amber-500'
+                              }`}
+                            />
+                            <span className="font-semibold text-slate-700">Pulse: {project.pulseStage}</span>
+                          </div>
+                          <span className="text-slate-400 text-[9.5px]">{project.lastUpdated}</span>
+                        </div>
 
                         <p className="text-xs text-slate-600 line-clamp-2 mb-3 leading-relaxed">
                           {project.challenge}

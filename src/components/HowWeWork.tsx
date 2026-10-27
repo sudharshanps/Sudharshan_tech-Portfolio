@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Search, Compass, Palette, Terminal, ShieldAlert, Rocket, CheckCircle } from 'lucide-react';
+import { Search, Compass, Palette, Terminal, ShieldAlert, Rocket, CheckCircle, Activity } from 'lucide-react';
 import { PROCESS_STEPS } from '../data/portfolioData';
 
 export const HowWeWork: React.FC = () => {
@@ -18,6 +18,8 @@ export const HowWeWork: React.FC = () => {
         return <ShieldAlert className="w-4 h-4 text-brand-blue" />;
       case '06':
         return <Rocket className="w-4 h-4 text-brand-blue" />;
+      case '07':
+        return <Activity className="w-4 h-4 text-brand-blue" />;
       default:
         return <CheckCircle className="w-4 h-4 text-brand-blue" />;
     }
@@ -36,7 +38,7 @@ export const HowWeWork: React.FC = () => {
             How We Work: Transparent & Disciplined
           </h2>
           <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-            From initial requirements discovery to cloud handover, our six-phase engineering pipeline ensures clear milestones, zero surprises, and verifiable deliverables.
+            From initial requirements discovery to cloud handover and ongoing telemetry, our 7-stage engineering pipeline ensures clear milestones, zero surprises, and verifiable deliverables.
           </p>
         </div>
 

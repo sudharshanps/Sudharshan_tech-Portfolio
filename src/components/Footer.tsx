@@ -1,10 +1,21 @@
 import React from 'react';
-import { ArrowUp, Mail, MapPin, Phone, Instagram } from 'lucide-react';
+import { ArrowUp, Mail, MapPin, Phone, Instagram, Activity, GitCommit, ShieldCheck } from 'lucide-react';
 import { COMPANY_INFO, SERVICES_DATA } from '../data/portfolioData';
 
-export const Footer: React.FC = () => {
+interface FooterProps {
+  onNavigate?: (view: 'home' | 'status' | 'changelog') => void;
+}
+
+export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleLinkClick = (e: React.MouseEvent, view: 'status' | 'changelog') => {
+    e.preventDefault();
+    if (onNavigate) {
+      onNavigate(view);
+    }
   };
 
   return (
@@ -83,40 +94,49 @@ export const Footer: React.FC = () => {
             </ul>
           </div>
 
-          {/* Column 3: Work & Systems */}
+          {/* Column 3: Engineering Telemetry & Tools */}
           <div className="space-y-3">
             <h4 className="text-xs font-mono uppercase tracking-wider text-slate-300 font-semibold">
-              Selected Work
+              Engineering & Systems
             </h4>
             <ul className="space-y-2 text-xs text-slate-400">
               <li>
-                <a href="#work" className="hover:text-white transition-colors">
-                  TECHNICO Website Project
+                <button
+                  onClick={(e) => handleLinkClick(e, 'status')}
+                  className="hover:text-white transition-colors flex items-center gap-1.5 cursor-pointer text-left"
+                >
+                  <Activity className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Live System Status (/status)</span>
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={(e) => handleLinkClick(e, 'changelog')}
+                  className="hover:text-white transition-colors flex items-center gap-1.5 cursor-pointer text-left"
+                >
+                  <GitCommit className="w-3.5 h-3.5 text-brand-blue-glow" />
+                  <span>Engineering Changelog (/changelog)</span>
+                </button>
+              </li>
+              <li>
+                <a href="#audit" className="hover:text-white transition-colors flex items-center gap-1.5">
+                  <ShieldCheck className="w-3.5 h-3.5 text-blue-400" />
+                  <span>Website Health Snapshot</span>
                 </a>
               </li>
               <li>
-                <a href="#work" className="hover:text-white transition-colors">
-                  TaskGuard Management
+                <a href="#tech-stack" className="hover:text-white transition-colors">
+                  Verified Tech Stack
                 </a>
               </li>
               <li>
-                <a href="#work" className="hover:text-white transition-colors">
-                  AI Invigilation Engine
+                <a href="#security" className="hover:text-white transition-colors">
+                  Security & Integrity Standards
                 </a>
               </li>
               <li>
-                <a href="#work" className="hover:text-white transition-colors">
-                  Virtual Air Painting
-                </a>
-              </li>
-              <li>
-                <a href="#work" className="hover:text-white transition-colors">
-                  CineStream Platform
-                </a>
-              </li>
-              <li>
-                <a href="#work" className="hover:text-white transition-colors">
-                  NIDHI SETU Civic Portal
+                <a href="#insights" className="hover:text-white transition-colors">
+                  Technical Articles & Insights
                 </a>
               </li>
             </ul>
@@ -157,8 +177,15 @@ export const Footer: React.FC = () => {
 
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 font-mono">
-          <div>
-            © {new Date().getFullYear()} SUDHARSHAN_TECH. All rights reserved. Founded by Sudharshan.P.S.
+          <div className="flex flex-wrap items-center gap-4">
+            <span>© {new Date().getFullYear()} SUDHARSHAN_TECH. All rights reserved. Founded by Sudharshan.P.S.</span>
+            <span className="hidden md:inline">•</span>
+            <button
+              onClick={(e) => handleLinkClick(e, 'status')}
+              className="text-slate-400 hover:text-white hover:underline cursor-pointer"
+            >
+              System Status: 100% Operational
+            </button>
           </div>
 
           <div className="flex items-center gap-6">
