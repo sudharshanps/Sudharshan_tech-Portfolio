@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Send, Sparkles, Bot, ArrowRight, User } from 'lucide-react';
+import { getApiUrl } from '../utils/api';
 
 interface AIAssistantWidgetProps {
   onOpenEnquiry: (serviceName?: string) => void;
@@ -59,7 +60,7 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({ onOpenEnqu
     setIsLoading(true);
 
     try {
-      const res = await fetch('/api/assistant', {
+      const res = await fetch(getApiUrl('/api/assistant'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ question: textToSend }),

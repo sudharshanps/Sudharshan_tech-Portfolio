@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, CheckCircle2, AlertCircle } from 'lucide-react';
 import { SERVICES_DATA, COMPANY_INFO } from '../data/portfolioData';
 import { Button } from './ui/Button';
+import { getApiUrl } from '../utils/api';
 
 interface ContactModalProps {
   isOpen: boolean;
@@ -66,7 +67,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({
     setIsSubmitting(true);
 
     try {
-      const res = await fetch('/api/contact', {
+      const res = await fetch(getApiUrl('/api/contact'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

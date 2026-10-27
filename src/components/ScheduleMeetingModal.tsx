@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Calendar, CheckCircle2, Send, AlertTriangle } from 'lucide-react';
 import { Button } from './ui/Button';
+import { getApiUrl } from '../utils/api';
 
 interface ScheduleMeetingModalProps {
   isOpen: boolean;
@@ -55,7 +56,7 @@ Attendee: ${fullName} <${email}> ${phone ? `| Phone: ${phone}` : ''}
 Notes: ${notes || 'Standard 30-minute technical discovery session'}`;
 
     try {
-      const res = await fetch('/api/contact', {
+      const res = await fetch(getApiUrl('/api/contact'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

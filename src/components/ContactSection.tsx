@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Mail, Phone, MapPin, CheckCircle2, Clock, Instagram, AlertCircle, Calculator, Calendar } from 'lucide-react';
 import { COMPANY_INFO, SERVICES_DATA } from '../data/portfolioData';
 import { Button } from './ui/Button';
+import { getApiUrl } from '../utils/api';
 
 interface ContactSectionProps {
   preselectedService?: string;
@@ -90,7 +91,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/api/contact', {
+      const response = await fetch(getApiUrl('/api/contact'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),

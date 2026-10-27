@@ -18,15 +18,18 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const PORT = process.env.PORT || 5000;
+const PORT = parseInt(process.env.PORT || '5000', 10);
+const HOST = process.env.HOST || '0.0.0.0';
 const ADMIN_SECRET = process.env.ADMIN_SECRET || 'st_admin_secret_2026';
 const MONITORING_INTERVAL_MS = parseInt(process.env.MONITORING_INTERVAL_MS || '60000', 10);
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
 
 // Persistence file paths
 const HISTORY_FILE = path.join(__dirname, 'monitoring-history.json');
 const INQUIRIES_FILE = path.join(__dirname, 'inquiries.json');
 const CHANGELOG_FILE = path.join(__dirname, 'changelog.json');
 const PULSE_FILE = path.join(__dirname, 'project-pulse.json');
+const DATABASE_FILE = path.join(__dirname, 'database.sqlite');
 
 // Default initial changelog entries
 const DEFAULT_CHANGELOG = [
@@ -150,10 +153,36 @@ const DEFAULT_PULSE = [
   },
 ];
 
+// Atomic file write helper (writes to temp file, then atomically renames to prevent partial write corruption)
+function safeWriteJsonSync(filePath, data) {
+  const dir = path.dirname(filePath);
+  const tempPath = path.join(
+    dir,
+    `.${path.basename(filePath)}.tmp.${Date.now()}.${Math.random().toString(36).slice(2, 7)}`
+  );
+  fs.writeFileSync(tempPath, JSON.stringify(data, null, 2), 'utf8');
+  fs.renameSync(tempPath, filePath);
+}
+
+// Resilient file read helper with fallback
+function safeReadJsonSync(filePath, fallback = []) {
+  try {
+    if (fs.existsSync(filePath)) {
+      const content = fs.readFileSync(filePath, 'utf8');
+      if (content && content.trim()) {
+        return JSON.parse(content);
+      }
+    }
+  } catch (err) {
+    console.error(`[Storage] Failed to parse ${filePath}:`, err.message);
+  }
+  return fallback;
+}
+
 function ensureFile(filePath, defaultData) {
   try {
     if (!fs.existsSync(filePath)) {
-      fs.writeFileSync(filePath, JSON.stringify(defaultData, null, 2), 'utf8');
+      safeWriteJsonSync(filePath, defaultData);
     }
   } catch (err) {
     console.error(`[Storage] Failed to initialize ${filePath}:`, err.message);
@@ -164,6 +193,105 @@ function ensureFile(filePath, defaultData) {
 ensureFile(CHANGELOG_FILE, DEFAULT_CHANGELOG);
 ensureFile(PULSE_FILE, DEFAULT_PULSE);
 ensureFile(INQUIRIES_FILE, []);
+
+// Optional SQLite ACID Database Layer (Node v22.5+)
+let sqliteDb = null;
+try {
+  const sqliteModule = await import('node:sqlite');
+  if (sqliteModule?.DatabaseSync) {
+    sqliteDb = new sqliteModule.DatabaseSync(DATABASE_FILE);
+    sqliteDb.exec(`
+      CREATE TABLE IF NOT EXISTS inquiries (
+        reference_id TEXT PRIMARY KEY,
+        timestamp TEXT NOT NULL,
+        full_name TEXT NOT NULL,
+        email TEXT NOT NULL,
+        phone TEXT,
+        company TEXT,
+        service_type TEXT,
+        budget_range TEXT,
+        timeline TEXT,
+        project_details TEXT,
+        raw_json TEXT NOT NULL
+      );
+    `);
+  }
+} catch {
+  // Built-in SQLite not available; atomic file persistence active
+}
+
+// Concurrency-safe promise queue for inquiry mutations
+let inquiryQueue = Promise.resolve();
+
+function appendInquiry(record) {
+  return new Promise((resolve, reject) => {
+    inquiryQueue = inquiryQueue.then(() => {
+      try {
+        const list = safeReadJsonSync(INQUIRIES_FILE, []);
+        list.push(record);
+        safeWriteJsonSync(INQUIRIES_FILE, list);
+
+        if (sqliteDb) {
+          try {
+            const stmt = sqliteDb.prepare(`
+              INSERT OR REPLACE INTO inquiries 
+              (reference_id, timestamp, full_name, email, phone, company, service_type, budget_range, timeline, project_details, raw_json)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            `);
+            stmt.run(
+              record.referenceId,
+              record.timestamp,
+              record.fullName,
+              record.email,
+              record.phone || '',
+              record.company || '',
+              record.serviceType || '',
+              record.budgetRange || '',
+              record.timeline || '',
+              record.projectDetails || '',
+              JSON.stringify(record)
+            );
+          } catch (sqlErr) {
+            console.warn('[SQLite] Mirror write failed:', sqlErr.message);
+          }
+        }
+
+        resolve(record);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  });
+}
+
+function deleteInquiry(targetRef) {
+  return new Promise((resolve, reject) => {
+    inquiryQueue = inquiryQueue.then(() => {
+      try {
+        let list = safeReadJsonSync(INQUIRIES_FILE, []);
+        const initialLen = list.length;
+        list = list.filter((item) => item.referenceId !== targetRef);
+        const removed = list.length < initialLen;
+        if (removed) {
+          safeWriteJsonSync(INQUIRIES_FILE, list);
+        }
+
+        if (sqliteDb) {
+          try {
+            const stmt = sqliteDb.prepare('DELETE FROM inquiries WHERE reference_id = ?');
+            stmt.run(targetRef);
+          } catch (sqlErr) {
+            console.warn('[SQLite] Delete failed:', sqlErr.message);
+          }
+        }
+
+        resolve({ removed, remainingCount: list.length });
+      } catch (err) {
+        reject(err);
+      }
+    });
+  });
+}
 
 // Admin Authorization check
 function isAuthorized(req) {
@@ -253,7 +381,7 @@ MONITORED_TARGETS.forEach((target) => {
 
 function saveMonitoringHistory() {
   try {
-    fs.writeFileSync(HISTORY_FILE, JSON.stringify(monitoringData, null, 2), 'utf8');
+    safeWriteJsonSync(HISTORY_FILE, monitoringData);
   } catch (err) {
     console.error('[Monitoring] Failed to persist history:', err.message);
   }
@@ -606,9 +734,21 @@ async function runWebsiteAudit(targetUrl) {
 
 // HTTP Server
 const server = http.createServer(async (req, res) => {
-  // CORS configuration
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, OPTIONS');
+  // Hardened Security Headers
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+
+  // Production-Ready Dynamic CORS Configuration
+  const reqOrigin = req.headers.origin;
+  if (reqOrigin) {
+    res.setHeader('Access-Control-Allow-Origin', reqOrigin);
+    res.setHeader('Vary', 'Origin');
+  } else {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+  }
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-admin-token');
 
   if (req.method === 'OPTIONS') {
@@ -724,7 +864,7 @@ const server = http.createServer(async (req, res) => {
       if (body.length > 256 * 1024) req.destroy();
     });
 
-    req.on('end', () => {
+    req.on('end', async () => {
       try {
         const data = JSON.parse(body || '{}');
 
@@ -777,17 +917,8 @@ const server = http.createServer(async (req, res) => {
           estimatorBrief,
         };
 
-        // Append to server-side inquiries log
-        try {
-          let list = [];
-          if (fs.existsSync(INQUIRIES_FILE)) {
-            list = JSON.parse(fs.readFileSync(INQUIRIES_FILE, 'utf8') || '[]');
-          }
-          list.push(record);
-          fs.writeFileSync(INQUIRIES_FILE, JSON.stringify(list, null, 2), 'utf8');
-        } catch (e) {
-          console.warn('[Enquiries] Could not write to disk:', e.message);
-        }
+        // Append to server-side inquiries log & SQLite ACID mirror
+        await appendInquiry(record);
 
         console.log(`[Enquiry Received] Ref: ${referenceId} from ${fullName} <${email}>`);
 
@@ -799,9 +930,9 @@ const server = http.createServer(async (req, res) => {
             message: 'Your project brief has been received. Founder Sudharshan.P.S will review and reply within 24 hours.',
           })
         );
-      } catch {
-        res.writeHead(400, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'Invalid JSON request payload' }));
+      } catch (err) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message || 'Internal Server Error' }));
       }
     });
     return;
@@ -874,9 +1005,7 @@ const server = http.createServer(async (req, res) => {
       return;
     }
     try {
-      const data = fs.existsSync(INQUIRIES_FILE)
-        ? JSON.parse(fs.readFileSync(INQUIRIES_FILE, 'utf8') || '[]')
-        : [];
+      const data = safeReadJsonSync(INQUIRIES_FILE, []);
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ success: true, count: data.length, inquiries: data }));
     } catch (e) {
@@ -896,19 +1025,14 @@ const server = http.createServer(async (req, res) => {
     }
     const targetRef = decodeURIComponent(deleteInquiryMatch[1]);
     try {
-      let list = fs.existsSync(INQUIRIES_FILE)
-        ? JSON.parse(fs.readFileSync(INQUIRIES_FILE, 'utf8') || '[]')
-        : [];
-      const initialLen = list.length;
-      list = list.filter((item) => item.referenceId !== targetRef);
-      if (list.length === initialLen) {
+      const result = await deleteInquiry(targetRef);
+      if (!result.removed) {
         res.writeHead(404, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: `Inquiry with reference ${targetRef} not found.` }));
         return;
       }
-      fs.writeFileSync(INQUIRIES_FILE, JSON.stringify(list, null, 2), 'utf8');
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ success: true, deleted: targetRef, remainingCount: list.length }));
+      res.end(JSON.stringify({ success: true, deleted: targetRef, remainingCount: result.remainingCount }));
     } catch (e) {
       res.writeHead(500, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ error: `Failed to delete inquiry: ${e.message}` }));
@@ -919,9 +1043,7 @@ const server = http.createServer(async (req, res) => {
   // 8. Changelog Read API
   if (req.method === 'GET' && pathname === '/api/changelog') {
     try {
-      const data = fs.existsSync(CHANGELOG_FILE)
-        ? JSON.parse(fs.readFileSync(CHANGELOG_FILE, 'utf8') || '[]')
-        : DEFAULT_CHANGELOG;
+      const data = safeReadJsonSync(CHANGELOG_FILE, DEFAULT_CHANGELOG);
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ success: true, count: data.length, changelog: data }));
     } catch (e) {
@@ -978,11 +1100,9 @@ const server = http.createServer(async (req, res) => {
           keyChanges,
         };
 
-        let list = fs.existsSync(CHANGELOG_FILE)
-          ? JSON.parse(fs.readFileSync(CHANGELOG_FILE, 'utf8') || '[]')
-          : [];
+        const list = safeReadJsonSync(CHANGELOG_FILE, []);
         list.unshift(newEntry);
-        fs.writeFileSync(CHANGELOG_FILE, JSON.stringify(list, null, 2), 'utf8');
+        safeWriteJsonSync(CHANGELOG_FILE, list);
 
         res.writeHead(201, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ success: true, entry: newEntry }));
@@ -997,9 +1117,7 @@ const server = http.createServer(async (req, res) => {
   // 10. Project Pulse Read API
   if (req.method === 'GET' && pathname === '/api/projects/pulse') {
     try {
-      const data = fs.existsSync(PULSE_FILE)
-        ? JSON.parse(fs.readFileSync(PULSE_FILE, 'utf8') || '[]')
-        : DEFAULT_PULSE;
+      const data = safeReadJsonSync(PULSE_FILE, DEFAULT_PULSE);
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ success: true, count: data.length, pulse: data }));
     } catch (e) {
@@ -1026,9 +1144,7 @@ const server = http.createServer(async (req, res) => {
     req.on('end', () => {
       try {
         const payload = JSON.parse(body || '{}');
-        let list = fs.existsSync(PULSE_FILE)
-          ? JSON.parse(fs.readFileSync(PULSE_FILE, 'utf8') || '[]')
-          : [...DEFAULT_PULSE];
+        const list = safeReadJsonSync(PULSE_FILE, [...DEFAULT_PULSE]);
         const idx = list.findIndex((item) => item.id.toLowerCase() === projectId);
         if (idx === -1) {
           res.writeHead(404, { 'Content-Type': 'application/json' });
@@ -1052,7 +1168,7 @@ const server = http.createServer(async (req, res) => {
           lastUpdated: date,
         };
 
-        fs.writeFileSync(PULSE_FILE, JSON.stringify(list, null, 2), 'utf8');
+        safeWriteJsonSync(PULSE_FILE, list);
 
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ success: true, updated: list[idx] }));
@@ -1070,9 +1186,27 @@ const server = http.createServer(async (req, res) => {
 });
 
 if (process.env.NODE_ENV !== 'test') {
-  server.listen(PORT, () => {
-    console.log(`SUDHARSHAN_TECH Backend & Health Monitoring Server active on port ${PORT}`);
+  server.listen(PORT, HOST, () => {
+    console.log(`SUDHARSHAN_TECH Backend & Health Monitoring Server active on ${HOST}:${PORT}`);
   });
+
+  const handleShutdown = (signal) => {
+    console.log(`\nReceived ${signal}. Gracefully terminating SUDHARSHAN_TECH server...`);
+    if (sqliteDb) {
+      try {
+        sqliteDb.close();
+      } catch (err) {
+        console.warn('SQLite close warning:', err.message);
+      }
+    }
+    server.close(() => {
+      console.log('SUDHARSHAN_TECH server closed successfully.');
+      process.exit(0);
+    });
+  };
+
+  process.on('SIGINT', () => handleShutdown('SIGINT'));
+  process.on('SIGTERM', () => handleShutdown('SIGTERM'));
 }
 
 export { server, isPrivateIp, sanitize, ADMIN_SECRET };

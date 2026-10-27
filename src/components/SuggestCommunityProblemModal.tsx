@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, HeartHandshake, CheckCircle2, AlertTriangle, Send, Sparkles } from 'lucide-react';
 import { Button } from './ui/Button';
+import { getApiUrl } from '../utils/api';
 
 interface SuggestCommunityProblemModalProps {
   isOpen: boolean;
@@ -78,7 +79,7 @@ Additional Details:
 ${additionalDetails.trim() || 'None specified.'}`;
 
     try {
-      const res = await fetch('/api/contact', {
+      const res = await fetch(getApiUrl('/api/contact'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

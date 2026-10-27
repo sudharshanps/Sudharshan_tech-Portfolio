@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { AuditReport } from '../types';
 import { Button } from './ui/Button';
+import { getApiUrl } from '../utils/api';
 
 interface WebsiteAuditSectionProps {
   onStartInquiryWithAudit?: (url: string, score: number) => void;
@@ -43,7 +44,7 @@ export const WebsiteAuditSection: React.FC<WebsiteAuditSectionProps> = ({
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/audit', {
+      const response = await fetch(getApiUrl('/api/audit'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ targetUrl: target }),

@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { CHANGELOG_DATA } from '../data/portfolioData';
 import { ChangelogCategory, ChangelogEntry } from '../types';
+import { getApiUrl } from '../utils/api';
 
 interface ChangelogPageProps {
   onBack: () => void;
@@ -23,7 +24,7 @@ export const ChangelogPage: React.FC<ChangelogPageProps> = ({ onBack }) => {
   const [searchQuery, setSearchQuery] = useState<string>('');
 
   useEffect(() => {
-    fetch('/api/changelog')
+    fetch(getApiUrl('/api/changelog'))
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (data?.changelog && Array.isArray(data.changelog) && data.changelog.length > 0) {

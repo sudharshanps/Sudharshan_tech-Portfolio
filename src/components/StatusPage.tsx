@@ -16,6 +16,7 @@ import {
 import { INITIAL_MONITORED_SERVICES, INITIAL_INCIDENTS } from '../data/portfolioData';
 import { MonitoredService, ServiceStatus, Incident } from '../types';
 import { Button } from './ui/Button';
+import { getApiUrl } from '../utils/api';
 
 interface StatusPageProps {
   onBack: () => void;
@@ -32,7 +33,7 @@ export const StatusPage: React.FC<StatusPageProps> = ({ onBack }) => {
   const fetchStatus = async (showLoader = false) => {
     if (showLoader) setIsRefreshing(true);
     try {
-      const res = await fetch('/api/status');
+      const res = await fetch(getApiUrl('/api/status'));
       if (res.ok) {
         const data = await res.json();
         if (data.services && data.services.length > 0) {
@@ -66,7 +67,7 @@ export const StatusPage: React.FC<StatusPageProps> = ({ onBack }) => {
   const handleManualCheck = async () => {
     setIsRefreshing(true);
     try {
-      await fetch('/api/status/check-now', { method: 'POST' });
+      await fetch(getApiUrl('/api/status/check-now'), { method: 'POST' });
     } catch {
       // ignore
     }
