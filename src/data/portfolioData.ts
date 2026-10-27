@@ -42,6 +42,8 @@ export const PROJECTS_DATA: Project[] = [
       'End-to-end frontend architecture, responsive layout engineering, component design system, and deployment pipeline configuration.',
     liveUrl: 'https://www.sterlitech.com/?utm_source=chatgpt.com',
     metricsOrHighlight: 'Verified Production Client Delivery',
+    image: '/assets/projects/technico-website.png',
+    imageFit: 'cover',
   },
   {
     id: 'taskguard',
@@ -67,6 +69,8 @@ export const PROJECTS_DATA: Project[] = [
     teamContribution:
       'System design, full-stack state management, database schema design, and responsive dashboard interface.',
     metricsOrHighlight: 'Role-Based Access & Live Pipeline Management',
+    image: '/assets/projects/taskguard-security.png',
+    imageFit: 'cover',
   },
   {
     id: 'ai-invigilation',
@@ -92,6 +96,8 @@ export const PROJECTS_DATA: Project[] = [
     teamContribution:
       'Vision algorithm implementation, landmark geometry mapping, event anomaly scoring heuristics, and test evaluation.',
     metricsOrHighlight: 'Real-Time Edge Computer Vision with Landmark Tracking',
+    image: '/assets/projects/ai-invigilation.png',
+    imageFit: 'cover',
   },
   {
     id: 'air-painting',
@@ -117,6 +123,8 @@ export const PROJECTS_DATA: Project[] = [
     teamContribution:
       'Hand landmark recognition pipeline, gesture classification logic, and frame buffer rendering math.',
     metricsOrHighlight: 'Contactless Gesture-Driven Digital Canvas',
+    image: '/assets/projects/virtual-air-painting.png',
+    imageFit: 'cover',
   },
   {
     id: 'cinestream',
@@ -142,6 +150,8 @@ export const PROJECTS_DATA: Project[] = [
     teamContribution:
       'User interface architecture, mock media stream controller, and distributed system design documentation.',
     metricsOrHighlight: 'Adaptive Bitrate & Microservice Blueprint',
+    image: '/assets/projects/cinestream.png',
+    imageFit: 'cover',
   },
   {
     id: 'nidhi-setu',

@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ExternalLink, CheckCircle, Code, ShieldCheck, Tag } from 'lucide-react';
+import { X, ExternalLink, CheckCircle, Code, ShieldCheck, Tag, Layers } from 'lucide-react';
 import { Project } from '../types';
 import { Button } from './ui/Button';
 
@@ -66,6 +66,32 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose, on
           {/* Body Content */}
           <div className="p-6 overflow-y-auto space-y-6 text-sm text-slate-700">
             
+            {/* Project Image Preview / Hero Banner */}
+            {project.image ? (
+              <div className="relative rounded-2xl overflow-hidden border border-slate-200 aspect-[16/9] sm:aspect-[2/1] bg-slate-950 shadow-sm">
+                <img
+                  src={project.image}
+                  alt={`${project.title} Interface Preview`}
+                  className="w-full h-full object-cover object-top"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+                <div className="absolute bottom-2.5 right-3 px-2 py-0.5 rounded bg-slate-900/80 backdrop-blur-md text-[10px] font-mono text-slate-300 border border-slate-700/60 shadow-sm">
+                  High-Resolution Interface Preview
+                </div>
+              </div>
+            ) : (
+              <div className="relative rounded-2xl overflow-hidden border border-slate-200 aspect-[16/9] sm:aspect-[2.4/1] bg-gradient-to-br from-slate-900 via-brand-navy to-slate-950 p-6 flex flex-col items-center justify-center text-center">
+                <div className="absolute inset-0 bg-tech-grid-dark opacity-35 pointer-events-none" />
+                <Layers className="w-8 h-8 text-brand-blue-glow mb-2" />
+                <h5 className="text-white font-mono font-bold text-xs sm:text-sm uppercase tracking-wider">
+                  Civic Tech Architecture & System Blueprint
+                </h5>
+                <p className="text-[11px] sm:text-xs text-slate-400 max-w-md mt-1 font-mono leading-relaxed">
+                  SUDHARSHAN_TECH social innovation initiative connecting eligible citizens and MSMEs to public welfare grants.
+                </p>
+              </div>
+            )}
+
             {/* Highlights banner */}
             {project.metricsOrHighlight && (
               <div className="flex items-center gap-2 p-3 rounded-xl bg-blue-50/70 border border-blue-100 text-brand-blue text-xs font-semibold">

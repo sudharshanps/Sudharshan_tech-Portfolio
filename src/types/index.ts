@@ -16,6 +16,8 @@ export interface Project {
   teamContribution: string;
   liveUrl?: string;
   metricsOrHighlight?: string;
+  image?: string;
+  imageFit?: 'cover' | 'contain';
 }
 
 export interface ServiceItem {

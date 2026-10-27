@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ShieldCheck, Code2, Eye } from 'lucide-react';
+import { ShieldCheck, Code2, Eye, Layers } from 'lucide-react';
 import { PROJECTS_DATA } from '../data/portfolioData';
 import { Project } from '../types';
 import { Button } from './ui/Button';
@@ -75,39 +75,68 @@ export const SelectedWork: React.FC<SelectedWorkProps> = ({ onSelectProject }) =
                 className="h-full"
               >
                 <Card3D maxTilt={3.5} className="h-full">
-                  <div className="h-full flex flex-col justify-between bg-white rounded-xl border border-slate-200 shadow-sm hover:border-brand-blue/50 hover:shadow-md transition-all duration-200 overflow-hidden">
+                  <div className="group h-full flex flex-col justify-between bg-white rounded-xl border border-slate-200 shadow-sm hover:border-brand-blue/50 hover:shadow-md transition-all duration-200 overflow-hidden">
                     
-                    {/* Visual Header / Preview Banner (Compact) */}
-                    <div className="relative h-36 bg-gradient-to-br from-slate-900 via-brand-navy to-slate-950 p-4 flex flex-col justify-between text-white border-b border-slate-800">
-                      <div className="absolute inset-0 bg-tech-grid-dark opacity-30 pointer-events-none" />
-                      
-                      {/* Category & Status Tags */}
-                      <div className="relative z-10 flex items-center justify-between">
+                    {/* Visual Header / Project Screenshot (16:9 Ratio with Subtle Hover Zoom) */}
+                    <div className="relative aspect-[16/9] w-full overflow-hidden bg-slate-950 border-b border-slate-200/80">
+                      {project.image ? (
+                        <>
+                          <img
+                            src={project.image}
+                            alt={`${project.title} Preview`}
+                            className="w-full h-full object-cover object-top transition-transform duration-300 ease-out group-hover:scale-105"
+                            loading="lazy"
+                          />
+                          {/* Subtle overlay gradient ensuring badge and label contrast */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-brand-navy/90 via-brand-navy/20 to-black/35 pointer-events-none" />
+                        </>
+                      ) : (
+                        /* Branded fallback technical graphic for un-imaged projects (NIDHI SETU) */
+                        <div className="w-full h-full bg-gradient-to-br from-slate-900 via-brand-navy to-slate-950 flex flex-col justify-between p-4 relative overflow-hidden">
+                          <div className="absolute inset-0 bg-tech-grid-dark opacity-35 pointer-events-none" />
+                          <div className="absolute -right-8 -bottom-8 w-32 h-32 rounded-full bg-brand-blue/10 blur-xl pointer-events-none" />
+                          <div className="relative z-10" />
+                          <div className="relative z-10 flex items-center justify-center my-auto">
+                            <div className="flex flex-col items-center text-center p-3 rounded-lg bg-white/5 border border-white/10 backdrop-blur-xs">
+                              <Layers className="w-6 h-6 text-brand-blue-glow mb-1.5" />
+                              <span className="text-[11px] font-mono font-semibold text-slate-200 uppercase tracking-wider">
+                                Civic Tech Architecture
+                              </span>
+                              <span className="text-[10px] text-slate-400 font-mono">
+                                Scheme Intelligence & Grant Discovery
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Category & Status Badges (Floating on Top Corners) */}
+                      <div className="absolute top-3 left-3 right-3 z-20 flex items-center justify-between gap-2 pointer-events-none">
                         <span
-                          className={`text-[9px] font-mono uppercase tracking-wider px-2 py-0.5 rounded font-semibold ${
+                          className={`text-[9.5px] font-mono uppercase tracking-wider px-2 py-0.5 rounded font-semibold backdrop-blur-md shadow-sm ${
                             project.isClientWork
-                              ? 'bg-blue-500/20 text-blue-300 border border-blue-400/30'
-                              : 'bg-slate-800 text-slate-300 border border-slate-700'
+                              ? 'bg-blue-600/90 text-white border border-blue-400/50'
+                              : 'bg-slate-900/85 text-slate-200 border border-slate-700/70'
                           }`}
                         >
                           {project.categoryLabel}
                         </span>
 
-                        <span className="text-[9px] font-mono text-slate-400 bg-slate-800/80 px-1.5 py-0.5 rounded border border-slate-700/60">
+                        <span className="text-[9.5px] font-mono text-slate-200 bg-slate-900/85 px-2 py-0.5 rounded backdrop-blur-md border border-slate-700/70 shadow-sm">
                           {project.status.split('/')[0]}
                         </span>
                       </div>
 
-                      {/* Visual Category Label */}
-                      <div className="relative z-10 flex items-center gap-1.5 text-xs font-mono text-slate-300">
+                      {/* Subtitle / Category Label (Floating at Bottom of Preview) */}
+                      <div className="absolute bottom-2.5 left-3 right-3 z-20 flex items-center gap-1.5 text-[11px] font-mono text-white/90 drop-shadow-md pointer-events-none">
                         {project.isClientWork ? (
-                          <ShieldCheck className="w-3.5 h-3.5 text-brand-blue-glow" />
+                          <ShieldCheck className="w-3.5 h-3.5 text-blue-400 shrink-0" />
                         ) : project.id.includes('ai') || project.id.includes('painting') ? (
-                          <Eye className="w-3.5 h-3.5 text-emerald-400" />
+                          <Eye className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                         ) : (
-                          <Code2 className="w-3.5 h-3.5 text-yellow-400" />
+                          <Code2 className="w-3.5 h-3.5 text-yellow-400 shrink-0" />
                         )}
-                        <span className="truncate text-[11px]">{project.subtitle}</span>
+                        <span className="truncate">{project.subtitle}</span>
                       </div>
                     </div>
 
