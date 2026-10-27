@@ -165,10 +165,10 @@ export const Footer: React.FC = () => {
             <span>Engineering Practical Solutions</span>
             <button
               onClick={scrollToTop}
-              className="inline-flex items-center gap-1.5 text-slate-400 hover:text-white transition-colors cursor-pointer"
+              className="group inline-flex items-center gap-1.5 text-slate-400 hover:text-white transition-colors cursor-pointer"
             >
               <span>Back to Top</span>
-              <ArrowUp className="w-3.5 h-3.5" />
+              <ArrowUp className="w-3.5 h-3.5 transition-transform duration-150 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:-translate-y-1" />
             </button>
           </div>
         </div>

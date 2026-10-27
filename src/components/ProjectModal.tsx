@@ -178,8 +178,9 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose, on
                 }}
                 variant="primary"
                 size="sm"
-                animation="fly-through"
-                contextualIcon="phone"
+                animation="nudge"
+                nudgeDirection="right"
+                contextualIcon="arrow"
                 ariaLabel="Discuss project"
               >
                 Discuss Similar Project

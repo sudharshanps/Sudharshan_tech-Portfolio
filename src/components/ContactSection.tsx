@@ -87,48 +87,48 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ preselectedServi
   };
 
   return (
-    <section id="contact" className="py-20 md:py-28 bg-white border-t border-slate-200/80 relative">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="contact" className="py-16 md:py-20 bg-white border-t border-slate-200/80 relative">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Top Banner / Heading */}
-        <div className="max-w-3xl mb-16">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-xs font-mono font-semibold text-brand-blue mb-4 uppercase tracking-wider">
+        <div className="max-w-2xl mb-12">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200/80 text-[11px] font-mono font-semibold text-brand-blue mb-3 uppercase tracking-wider">
             Start a Conversation
           </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-brand-navy tracking-tight mb-4">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-brand-navy tracking-tight mb-2">
             HAVE SOMETHING WORTH BUILDING?
           </h2>
-          <p className="text-base sm:text-lg text-slate-600 leading-relaxed">
+          <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
             Tell us what you're planning. Let's explore how we can build it with practical architecture, thoughtful design, and disciplined engineering.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
           
           {/* Left Column: Direct Contact Info & Guarantees */}
-          <div className="lg:col-span-5 space-y-8">
-            <div className="p-7 rounded-3xl bg-brand-navy text-white shadow-soft-lg space-y-6">
+          <div className="lg:col-span-5 space-y-6">
+            <div className="p-6 rounded-2xl bg-brand-navy text-white shadow-md space-y-5">
               <div>
-                <span className="text-xs font-mono text-brand-blue-glow font-bold uppercase tracking-widest block mb-1">
+                <span className="text-[10px] font-mono text-brand-blue-glow font-bold uppercase tracking-widest block mb-1">
                   Direct Verified Channels
                 </span>
-                <h3 className="text-xl font-bold mb-2">Connect Directly with Our Founder</h3>
-                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                <h3 className="text-lg font-bold mb-1.5">Connect Directly with Our Founder</h3>
+                <p className="text-xs text-slate-300 leading-relaxed">
                   Connect with Sudharshan.P.S and our team in Coimbatore. We review every project enquiry and respond within 24 hours.
                 </p>
               </div>
 
-              <div className="space-y-4 pt-2 border-t border-slate-800">
+              <div className="space-y-3 pt-2 border-t border-slate-800">
                 {/* Official Email Link */}
                 <a
                   href={`mailto:${COMPANY_INFO.email}?subject=Project%20Enquiry%20%E2%80%94%20SUDHARSHAN_TECH`}
-                  className="flex items-start gap-3.5 text-sm text-slate-200 hover:text-brand-blue-glow transition-colors group p-2 rounded-xl hover:bg-slate-800/60"
+                  className="flex items-start gap-3 text-xs sm:text-sm text-slate-200 hover:text-brand-blue-glow transition-colors group p-2 rounded-lg hover:bg-slate-800/60"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center shrink-0 group-hover:bg-brand-blue transition-colors">
-                    <Mail className="w-4 h-4 text-white" />
+                  <div className="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center shrink-0 group-hover:bg-brand-blue transition-colors">
+                    <Mail className="w-3.5 h-3.5 text-white" />
                   </div>
                   <div>
-                    <span className="text-[11px] font-mono text-slate-400 block">Direct Email</span>
+                    <span className="text-[10px] font-mono text-slate-400 block">Direct Email</span>
                     <span className="font-semibold text-white group-hover:underline break-all">
                       {COMPANY_INFO.email}
                     </span>
@@ -138,13 +138,13 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ preselectedServi
                 {/* Official Phone Link */}
                 <a
                   href={`tel:${COMPANY_INFO.phone.replace(/\s+/g, '')}`}
-                  className="flex items-start gap-3.5 text-sm text-slate-200 hover:text-brand-blue-glow transition-colors group p-2 rounded-xl hover:bg-slate-800/60"
+                  className="flex items-start gap-3 text-xs sm:text-sm text-slate-200 hover:text-brand-blue-glow transition-colors group p-2 rounded-lg hover:bg-slate-800/60"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center shrink-0 group-hover:bg-brand-blue transition-colors">
-                    <Phone className="w-4 h-4 text-white" />
+                  <div className="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center shrink-0 group-hover:bg-brand-blue transition-colors">
+                    <Phone className="w-3.5 h-3.5 text-white" />
                   </div>
                   <div>
-                    <span className="text-[11px] font-mono text-slate-400 block">Phone / WhatsApp</span>
+                    <span className="text-[10px] font-mono text-slate-400 block">Phone / WhatsApp</span>
                     <span className="font-semibold text-white group-hover:underline">
                       {COMPANY_INFO.phone}
                     </span>
@@ -156,13 +156,13 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ preselectedServi
                   href={COMPANY_INFO.instagramUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-start gap-3.5 text-sm text-slate-200 hover:text-brand-blue-glow transition-colors group p-2 rounded-xl hover:bg-slate-800/60"
+                  className="flex items-start gap-3 text-xs sm:text-sm text-slate-200 hover:text-brand-blue-glow transition-colors group p-2 rounded-lg hover:bg-slate-800/60"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center shrink-0 group-hover:bg-pink-600 transition-colors">
-                    <Instagram className="w-4 h-4 text-white" />
+                  <div className="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center shrink-0 group-hover:bg-pink-600 transition-colors">
+                    <Instagram className="w-3.5 h-3.5 text-white" />
                   </div>
                   <div>
-                    <span className="text-[11px] font-mono text-slate-400 block">Official Instagram</span>
+                    <span className="text-[10px] font-mono text-slate-400 block">Official Instagram</span>
                     <span className="font-semibold text-white group-hover:underline">
                       @sudharshan_tech
                     </span>
@@ -170,28 +170,28 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ preselectedServi
                 </a>
 
                 {/* Headquarters */}
-                <div className="flex items-start gap-3.5 text-sm text-slate-200 p-2">
-                  <div className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center shrink-0">
-                    <MapPin className="w-4 h-4 text-white" />
+                <div className="flex items-start gap-3 text-xs sm:text-sm text-slate-200 p-2">
+                  <div className="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center shrink-0">
+                    <MapPin className="w-3.5 h-3.5 text-white" />
                   </div>
                   <div>
-                    <span className="text-[11px] font-mono text-slate-400 block">Engineering Headquarters</span>
+                    <span className="text-[10px] font-mono text-slate-400 block">Engineering Headquarters</span>
                     <span className="font-medium text-white">{COMPANY_INFO.location}</span>
                   </div>
                 </div>
               </div>
 
               {/* Response Promise */}
-              <div className="pt-4 border-t border-slate-800 flex items-center gap-2.5 text-xs text-emerald-400 font-mono">
-                <Clock className="w-4 h-4" />
+              <div className="pt-3 border-t border-slate-800 flex items-center gap-2 text-xs text-emerald-400 font-mono">
+                <Clock className="w-3.5 h-3.5" />
                 <span>Guaranteed Response within 24 Hours</span>
               </div>
             </div>
 
             {/* What Happens Next Card */}
-            <div className="p-6 rounded-2xl bg-slate-50 border border-slate-200/90 space-y-3 text-xs sm:text-sm text-slate-600">
+            <div className="p-5 rounded-xl bg-slate-50 border border-slate-200 space-y-2 text-xs text-slate-600">
               <h4 className="font-bold text-brand-navy">What happens after you submit?</h4>
-              <ol className="space-y-2 list-decimal list-inside text-xs leading-relaxed text-slate-600">
+              <ol className="space-y-1.5 list-decimal list-inside text-xs leading-relaxed text-slate-600">
                 <li>Sudharshan reviews your technical parameters and business goals.</li>
                 <li>We schedule a focused 20-minute discovery call to clarify architecture.</li>
                 <li>We provide a detailed sprint plan, tech specification, and honest estimate.</li>
@@ -201,7 +201,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ preselectedServi
 
           {/* Right Column: Project Enquiry Form */}
           <div className="lg:col-span-7">
-            <div className="bg-white rounded-3xl border border-slate-200/90 shadow-soft-lg p-6 sm:p-9">
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 sm:p-7">
               {isSubmitted ? (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}
@@ -398,15 +398,16 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ preselectedServi
                     />
                   </div>
 
-                  {/* Submit Button with Fly-Through Micro-Interaction */}
+                  {/* Submit Button with 4px Icon-Nudge */}
                   <div className="pt-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <Button
                       type="submit"
                       disabled={isSubmitting}
                       variant="primary"
-                      size="lg"
-                      animation="fly-through"
-                      contextualIcon="send"
+                      size="md"
+                      animation="nudge"
+                      nudgeDirection="right"
+                      contextualIcon="arrow"
                       ariaLabel="Submit project enquiry"
                     >
                       {isSubmitting ? 'Dispatching Details...' : 'Discuss Your Project'}

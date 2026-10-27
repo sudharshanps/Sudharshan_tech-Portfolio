@@ -188,8 +188,9 @@ export const ContactModal: React.FC<ContactModalProps> = ({
                     disabled={isSubmitting}
                     variant="primary"
                     size="md"
-                    animation="fly-through"
-                    contextualIcon="send"
+                    animation="nudge"
+                    nudgeDirection="right"
+                    contextualIcon="arrow"
                     className="w-full"
                     ariaLabel="Send project enquiry"
                   >

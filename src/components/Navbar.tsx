@@ -26,14 +26,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenContactModal }) => {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 20) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
+      setIsScrolled(window.scrollY > 15);
 
       // Determine active section based on scroll position
-      const scrollPosition = window.scrollY + 140;
+      const scrollPosition = window.scrollY + 120;
       for (let i = NAV_LINKS.length - 1; i >= 0; i--) {
         const sectionId = NAV_LINKS[i].href.substring(1);
         const el = document.getElementById(sectionId);
@@ -69,7 +65,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenContactModal }) => {
     const targetId = href.substring(1);
     const element = document.getElementById(targetId);
     if (element) {
-      const navOffset = 85;
+      const navOffset = 70;
       const elementPosition = element.getBoundingClientRect().top + window.scrollY;
       window.scrollTo({
         top: elementPosition - navOffset,
@@ -80,26 +76,26 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenContactModal }) => {
 
   return (
     <motion.header
-      initial={{ y: -20, opacity: 0 }}
+      initial={{ y: -16, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.45, ease: 'easeOut' }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      transition={{ duration: 0.35, ease: 'easeOut' }}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-200 ${
         isScrolled
-          ? 'bg-white/95 backdrop-blur-md border-b border-slate-200/90 shadow-soft-sm py-2.5'
-          : 'bg-white/80 backdrop-blur-sm border-b border-slate-100 py-3.5'
+          ? 'bg-white/95 backdrop-blur-md border-b border-slate-200/90 shadow-sm py-2'
+          : 'bg-white/85 backdrop-blur-sm border-b border-slate-100 py-2.5'
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-11">
           
           {/* Logo container: official uploaded logo */}
           <a
             href="#hero"
             onClick={(e) => handleNavClick(e, '#hero')}
-            className="group flex items-center gap-3 transition-opacity duration-200 focus-visible:ring-2 focus-visible:ring-brand-blue rounded-lg p-1 -ml-1"
+            className="group flex items-center gap-2.5 transition-opacity duration-200 focus-visible:ring-2 focus-visible:ring-brand-blue rounded-lg p-1 -ml-1"
             aria-label="SUDHARSHAN_TECH Home"
           >
-            <div className="relative h-11 sm:h-12 w-auto flex items-center">
+            <div className="relative h-9 sm:h-10 w-auto flex items-center">
               <img
                 src={COMPANY_INFO.officialLogoUrl}
                 alt="SUDHARSHAN_TECH Official Logo"
@@ -122,10 +118,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenContactModal }) => {
                   onClick={(e) => handleNavClick(e, link.href)}
                   onMouseEnter={() => setHoveredLink(link.href)}
                   onMouseLeave={() => setHoveredLink(null)}
-                  className={`relative px-3 py-2 text-sm font-medium transition-colors duration-200 rounded-md focus-visible:ring-2 focus-visible:ring-brand-blue ${
+                  className={`relative px-3 py-1.5 text-xs font-medium transition-colors duration-200 rounded-md focus-visible:ring-2 focus-visible:ring-brand-blue ${
                     isActive
                       ? 'text-brand-blue font-semibold'
-                      : 'text-brand-navy-muted hover:text-brand-blue'
+                      : 'text-slate-600 hover:text-brand-blue'
                   }`}
                 >
                   {link.name}
@@ -135,7 +131,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenContactModal }) => {
                     <motion.div
                       layoutId="navbar-underline"
                       className="absolute bottom-0 left-2 right-2 h-[2px] bg-brand-blue rounded-full"
-                      transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                      transition={{ type: 'spring', stiffness: 400, damping: 32 }}
                     />
                   )}
                 </a>
@@ -143,14 +139,15 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenContactModal }) => {
             })}
           </nav>
 
-          {/* Far Right: Start a Project CTA Button with Arrow Fly-Through Micro-Interaction */}
+          {/* Far Right: Start a Project CTA Button with 4px Icon-Nudge */}
           <div className="hidden sm:flex items-center gap-3">
             <Button
               onClick={onOpenContactModal}
               variant="primary"
-              size="md"
-              animation="fly-through"
-              contextualIcon="phone"
+              size="sm"
+              animation="nudge"
+              nudgeDirection="right"
+              contextualIcon="arrow"
               ariaLabel="Start a project with SUDHARSHAN_TECH"
             >
               Start a Project
@@ -162,14 +159,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenContactModal }) => {
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               type="button"
-              className="p-2 rounded-lg text-brand-navy hover:text-brand-blue hover:bg-slate-100 transition-colors focus-visible:ring-2 focus-visible:ring-brand-blue"
+              className="p-1.5 rounded-lg text-brand-navy hover:text-brand-blue hover:bg-slate-100 transition-colors focus-visible:ring-2 focus-visible:ring-brand-blue"
               aria-expanded={mobileMenuOpen}
               aria-label="Toggle navigation menu"
             >
               {mobileMenuOpen ? (
-                <X className="w-6 h-6 text-brand-navy" />
+                <X className="w-5 h-5 text-brand-navy" />
               ) : (
-                <Menu className="w-6 h-6 text-brand-navy" />
+                <Menu className="w-5 h-5 text-brand-navy" />
               )}
             </button>
           </div>
@@ -183,10 +180,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenContactModal }) => {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.25, ease: 'easeInOut' }}
-            className="lg:hidden border-b border-slate-200 bg-white/98 backdrop-blur-md px-4 pt-3 pb-6 shadow-soft-lg overflow-hidden"
+            transition={{ duration: 0.2, ease: 'easeInOut' }}
+            className="lg:hidden border-b border-slate-200 bg-white/98 backdrop-blur-md px-4 pt-2 pb-5 shadow-lg overflow-hidden"
           >
-            <div className="flex flex-col space-y-1.5 pt-2">
+            <div className="flex flex-col space-y-1 pt-1">
               {NAV_LINKS.map((link) => {
                 const sectionId = link.href.substring(1);
                 const isActive = activeSection === sectionId;
@@ -195,7 +192,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenContactModal }) => {
                     key={link.name}
                     href={link.href}
                     onClick={(e) => handleNavClick(e, link.href)}
-                    className={`flex items-center justify-between px-3.5 py-2.5 rounded-lg text-base font-medium transition-colors ${
+                    className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                       isActive
                         ? 'bg-blue-50 text-brand-blue font-semibold'
                         : 'text-brand-navy hover:bg-slate-50 hover:text-brand-blue'
@@ -207,16 +204,17 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenContactModal }) => {
                 );
               })}
 
-              <div className="pt-4 mt-2 border-t border-slate-100">
+              <div className="pt-3 mt-2 border-t border-slate-100">
                 <Button
                   onClick={() => {
                     setMobileMenuOpen(false);
                     onOpenContactModal();
                   }}
                   variant="primary"
-                  size="lg"
-                  animation="fly-through"
-                  contextualIcon="phone"
+                  size="md"
+                  animation="nudge"
+                  nudgeDirection="right"
+                  contextualIcon="arrow"
                   className="w-full"
                 >
                   Start a Project
