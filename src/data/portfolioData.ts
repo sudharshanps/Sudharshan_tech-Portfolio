@@ -6,6 +6,9 @@ import {
   ChangelogEntry,
   MonitoredService,
   Incident,
+  SocietyOffering,
+  CommunityPillar,
+  CommunityWorkflowStep,
 } from '../types';
 
 export const COMPANY_INFO = {
@@ -822,3 +825,166 @@ export const BLOG_ARTICLES = [
     tags: ['Security', 'Node.js', 'SSRF', 'OWASP'],
   },
 ];
+
+export const SOCIETY_DATA: SocietyOffering[] = [
+  {
+    id: 'local-business',
+    category: 'Local Enterprise',
+    title: 'Digital Support for Local Businesses',
+    iconName: 'Store',
+    badge: 'Grassroots Economy',
+    description:
+      'Empowering small shops, neighborhood startups, and local service providers with modern digital presence without enterprise overhead.',
+    offerings: [
+      'Affordable, fast-loading business websites',
+      'Interactive digital product catalogues & showcases',
+      'Online quote inquiry & customer booking forms',
+      'Basic operational workflow automation',
+      'Guidance on local search listings & online credibility',
+    ],
+  },
+  {
+    id: 'student-tech',
+    category: 'Education & Mentorship',
+    title: 'Student Technology & Digital Learning',
+    iconName: 'GraduationCap',
+    badge: 'Skill Development',
+    description:
+      'Bridging academic theory and production software engineering through practical project guidance, code demos, and digital literacy.',
+    offerings: [
+      'Beginner-friendly technology awareness sessions',
+      'Modern web development & software architecture demos',
+      'Everyday cybersecurity & digital hygiene guidance',
+      'Final-year project scoping & code review feedback',
+      'Curated open-access engineering learning resources',
+    ],
+    disclaimer:
+      'Notice: Educational mentoring sessions focus on practical engineering skill-building and do not constitute formal university degrees or accredited certifications.',
+  },
+  {
+    id: 'digital-awareness',
+    category: 'Public Safety',
+    title: 'Community Digital Awareness',
+    iconName: 'ShieldCheck',
+    badge: 'Online Safety',
+    description:
+      'Promoting responsible, secure internet navigation for everyday citizens, parents, and community members facing modern online risks.',
+    offerings: [
+      'Practical cybersecurity awareness for non-technical users',
+      'Phishing, SMS scam & credential safety education',
+      'Data privacy & personal information protection tips',
+      'Fundamental smartphone & computer digital literacy',
+      'Responsible, safe adoption of AI tools and assistants',
+    ],
+  },
+  {
+    id: 'ngo-support',
+    category: 'Civil Society',
+    title: 'Support for NGOs & Social Initiatives',
+    iconName: 'HeartHandshake',
+    badge: 'Non-Profit Enablement',
+    description:
+      'Helping registered social initiatives, self-help groups, and non-profits communicate their mission with clarity and transparency.',
+    offerings: [
+      'Clear, accessible organizational mission websites',
+      'Community volunteer registration & coordination forms',
+      'Public awareness & social campaign landing pages',
+      'Transparent initiative impact and progress reports',
+      'Digital communication & resource-sharing tools',
+    ],
+    disclaimer:
+      'Notice: We build informational platforms and volunteer coordination workflows; we do not operate as an escrow service or financial payment processor.',
+  },
+  {
+    id: 'accessible-tech',
+    category: 'Universal Design',
+    title: 'Accessible Digital Solutions',
+    iconName: 'Accessibility',
+    badge: 'Digital Inclusion',
+    description:
+      'Championing inclusive digital experiences designed for diverse users, varying internet bandwidths, and differing technical familiarity.',
+    offerings: [
+      'Mobile-first, low-bandwidth optimized web platforms',
+      'High-contrast typography adhering to WCAG 2.1 AA',
+      'Full keyboard-only navigation & screen-reader compatibility',
+      'Clean, uncluttered forms with clear error recovery',
+      'Intuitive digital workflows requiring zero specialized training',
+    ],
+  },
+  {
+    id: 'community-problems',
+    category: 'Civic Innovation',
+    title: 'Technology for Community Challenges',
+    iconName: 'Compass',
+    badge: 'Civic Problem-Solving',
+    description:
+      'Exploring open, collaborative software prototypes to address genuine neighborhood, educational, and civic coordination bottlenecks.',
+    offerings: [
+      'Community resource & helpline information directories',
+      'Open educational material & study note sharing portals',
+      'Local artisan & neighborhood service discovery hubs',
+      'Civic event & mutual-aid coordination tools',
+      'Lightweight data management for community associations',
+    ],
+    disclaimer:
+      'Notice: These represent active architectural explorations and community problem statements open for collaboration, rather than completed commercial deployments.',
+  },
+];
+
+export const COMMUNITY_PILLARS: CommunityPillar[] = [
+  {
+    title: 'Empower',
+    tagline: 'Build Confidence',
+    description:
+      'Equip students, local entrepreneurs, and everyday citizens with practical confidence to navigate modern digital tools, code, and online safety.',
+    iconName: 'Sparkles',
+  },
+  {
+    title: 'Enable',
+    tagline: 'Make Tech Accessible',
+    description:
+      'Remove technical barriers by crafting affordable, lightweight, and human-centered software architectures that anyone can use.',
+    iconName: 'Zap',
+  },
+  {
+    title: 'Elevate',
+    tagline: 'Create Opportunities',
+    description:
+      'Help local shops, non-profits, and civic groups unlock opportunities, improve daily workflows, and serve their communities better.',
+    iconName: 'TrendingUp',
+  },
+];
+
+export const COMMUNITY_PROCESS_STEPS: CommunityWorkflowStep[] = [
+  {
+    step: 1,
+    title: 'Listen to Community Needs',
+    description: 'Understand genuine challenges faced by students, non-profits, or local shop owners through open dialogue.',
+  },
+  {
+    step: 2,
+    title: 'Identify the Root Problem',
+    description: 'Separate technology hype from real human obstacles to pinpoint where software can genuinely help.',
+  },
+  {
+    step: 3,
+    title: 'Design a Practical Solution',
+    description: 'Architect a lightweight, low-maintenance, accessible digital approach with minimal operating cost.',
+  },
+  {
+    step: 4,
+    title: 'Build & Test Locally',
+    description: 'Implement with clean code, test directly with real community members, and verify ease of use.',
+  },
+  {
+    step: 5,
+    title: 'Measure Meaningful Impact',
+    description: 'Review qualitative outcomes: Did this save time, teach a skill, or expand opportunity for real people?',
+  },
+];
+
+export const COMMUNITY_POLICY_NOTICE = {
+  title: 'Our Community Review & Pro Bono Policy',
+  message:
+    'Every community suggestion is personally reviewed by Founder Sudharshan.P.S. Submitting a proposal initiates an open feasibility review and does not guarantee free services, funding, or implementation. Where bandwidth and resources permit, SUDHARSHAN_TECH explores selected pro bono, mentored, or subsidized technical support for verified public causes.',
+};

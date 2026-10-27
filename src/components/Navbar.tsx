@@ -17,6 +17,7 @@ const NAV_LINKS = [
   { name: 'Audit', href: '#audit' },
   { name: 'Tech Stack', href: '#tech-stack' },
   { name: 'Process', href: '#process' },
+  { name: 'Society', href: '#society' },
   { name: 'About', href: '#about' },
   { name: 'Team', href: '#team' },
   { name: 'Contact', href: '#contact' },

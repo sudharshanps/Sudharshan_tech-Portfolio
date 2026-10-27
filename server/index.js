@@ -836,6 +836,15 @@ const server = http.createServer(async (req, res) => {
         } else if (question.includes('contact') || question.includes('phone') || question.includes('email') || question.includes('hire')) {
           answer =
             'You can contact Founder Sudharshan.P.S directly at sudharshanthemagnet@gmail.com, call +91 9791495418, or use the "Start a Project" enquiry form on our website.';
+        } else if (
+          question.includes('society') ||
+          question.includes('community') ||
+          question.includes('student') ||
+          question.includes('ngo') ||
+          question.includes('social')
+        ) {
+          answer =
+            'Under our "Technology for Everyone" initiative, SUDHARSHAN_TECH helps local businesses with digital presence, mentors students with practical tech demos, promotes community cybersecurity hygiene, and supports non-profits with accessible platforms. You can suggest a community challenge directly via our website.';
         } else {
           answer =
             'SUDHARSHAN_TECH turns complex technical challenges into practical, thoughtfully engineered digital solutions. To discuss your exact requirements, use our Smart Estimator or schedule a consultation via our contact form.';

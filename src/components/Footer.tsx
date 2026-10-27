@@ -1,5 +1,15 @@
 import React from 'react';
-import { ArrowUp, Mail, MapPin, Phone, Instagram, Activity, GitCommit, ShieldCheck } from 'lucide-react';
+import {
+  ArrowUp,
+  Mail,
+  MapPin,
+  Phone,
+  Instagram,
+  Activity,
+  GitCommit,
+  ShieldCheck,
+  HeartHandshake,
+} from 'lucide-react';
 import { COMPANY_INFO, SERVICES_DATA } from '../data/portfolioData';
 
 interface FooterProps {
@@ -137,6 +147,12 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
               <li>
                 <a href="#insights" className="hover:text-white transition-colors">
                   Technical Articles & Insights
+                </a>
+              </li>
+              <li>
+                <a href="#society" className="hover:text-white transition-colors flex items-center gap-1.5">
+                  <HeartHandshake className="w-3.5 h-3.5 text-rose-400" />
+                  <span>Technology for Everyone</span>
                 </a>
               </li>
             </ul>

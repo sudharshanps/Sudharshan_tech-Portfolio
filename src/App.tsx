@@ -20,6 +20,8 @@ import { AIAssistantWidget } from './components/AIAssistantWidget';
 import { StatusPage } from './components/StatusPage';
 import { ChangelogPage } from './components/ChangelogPage';
 import { NotFoundPage } from './components/NotFoundPage';
+import { TechnologyForSociety } from './components/TechnologyForSociety';
+import { SuggestCommunityProblemModal } from './components/SuggestCommunityProblemModal';
 import { Project } from './types';
 
 type CurrentView = 'home' | 'status' | 'changelog' | 'not-found';
@@ -38,6 +40,8 @@ export const App: React.FC = () => {
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [isEstimatorModalOpen, setIsEstimatorModalOpen] = useState(false);
   const [isSchedulerModalOpen, setIsSchedulerModalOpen] = useState(false);
+  const [isCommunityModalOpen, setIsCommunityModalOpen] = useState(false);
+  const [communitySupportType, setCommunitySupportType] = useState('Civic / Community Problem to Solve');
   const [selectedService, setSelectedService] = useState('Web Development');
   const [transferredBrief, setTransferredBrief] = useState('');
   const [transferredBudget, setTransferredBudget] = useState('');
@@ -111,6 +115,22 @@ export const App: React.FC = () => {
     setSelectedService(serviceName);
     setTransferredBrief(
       `Preliminary Security & Performance Audit for ${url} (Score: ${score}/100).\nWe request a remediation plan covering discovered HTTP header, latency, and markup observations.`
+    );
+    handleSelectServiceForInquiry(serviceName);
+  };
+
+  const handleOpenCommunityModal = (supportType?: string) => {
+    if (supportType) {
+      setCommunitySupportType(supportType);
+    }
+    setIsCommunityModalOpen(true);
+  };
+
+  const handleCollaborateForSociety = () => {
+    const serviceName = 'Community & Social Impact Collaboration';
+    setSelectedService(serviceName);
+    setTransferredBrief(
+      `[COMMUNITY & SOCIAL IMPACT COLLABORATION]\nWe are reaching out to explore an educational, local business enablement, or grassroots digital initiative with SUDHARSHAN_TECH.\nWe would like to discuss technical feasibility and collaborative opportunities.`
     );
     handleSelectServiceForInquiry(serviceName);
   };
@@ -206,13 +226,19 @@ export const App: React.FC = () => {
         {/* 08 — Engineering Insights & Writing */}
         <BlogSection />
 
-        {/* 09 — About Us */}
+        {/* 09 — Technology for Everyone (Technology for Society) */}
+        <TechnologyForSociety
+          onCollaborate={handleCollaborateForSociety}
+          onOpenSuggestModal={handleOpenCommunityModal}
+        />
+
+        {/* 10 — About Us */}
         <About />
 
-        {/* 10 — Meet Our Team (Founder Sudharshan & Harini R) */}
+        {/* 11 — Meet Our Team (Founder Sudharshan & Harini R) */}
         <Team onOpenContactModal={() => handleOpenContactModal()} />
 
-        {/* 11 — Contact CTA & Project Enquiry Form */}
+        {/* 12 — Contact CTA & Project Enquiry Form */}
         <ContactSection
           preselectedService={selectedService}
           initialProjectDetails={transferredBrief}
@@ -225,6 +251,13 @@ export const App: React.FC = () => {
 
       {/* Footer with Telemetry & Engineering Links */}
       <Footer onNavigate={navigateTo} />
+
+      {/* Suggest a Community Problem Modal */}
+      <SuggestCommunityProblemModal
+        isOpen={isCommunityModalOpen}
+        onClose={() => setIsCommunityModalOpen(false)}
+        initialSupportType={communitySupportType}
+      />
 
       {/* Case Study Deep Dive Modal with Project Pulse */}
       <ProjectModal

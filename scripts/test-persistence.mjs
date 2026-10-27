@@ -317,6 +317,57 @@ async function runSuite() {
     });
   }
 
+  // 12. Community Proposal & Technology for Everyone Submission Flow
+  console.log('\n--- Auditing Community Proposal & Technology for Everyone ---');
+  const communityRes = await dispatch(server, {
+    method: 'POST',
+    url: '/api/contact',
+    body: {
+      fullName: 'Coimbatore Community Leader',
+      email: 'community@coimbatore.org',
+      company: 'Farmers Self-Help Initiative',
+      serviceType: 'Community Problem Suggestion',
+      budgetRange: 'Community / Pro Bono Review',
+      projectDetails:
+        '[COMMUNITY PROBLEM / SOCIAL PROPOSAL]\nCategory: Civic / Community Problem to Solve\nProblem: Accessible regional seed inventory portal.',
+    },
+  });
+  assert('Community problem proposal responds HTTP 200', communityRes.statusCode === 200);
+  assert(
+    'Community problem proposal returns genuine referenceId',
+    typeof communityRes.json?.referenceId === 'string' && communityRes.json.referenceId.startsWith('ST-')
+  );
+
+  const commRef = communityRes.json?.referenceId;
+  if (commRef) {
+    const diskInq = JSON.parse(
+      fs.readFileSync(path.join(rootDir, 'server', 'inquiries.json'), 'utf8')
+    );
+    assert(
+      'Community submission written to disk in server/inquiries.json',
+      diskInq.some((i) => i.referenceId === commRef)
+    );
+
+    // Clean up
+    await dispatch(server, {
+      method: 'DELETE',
+      url: `/api/inquiries/${encodeURIComponent(commRef)}`,
+      headers: { 'x-admin-token': ADMIN_SECRET },
+    });
+  }
+
+  // Test AI Assistant for community answer
+  const aiCommunityRes = await dispatch(server, {
+    method: 'POST',
+    url: '/api/assistant',
+    body: { question: 'How does your company help society or students?' },
+  });
+  assert(
+    'AI assistant answers community and society question',
+    aiCommunityRes.statusCode === 200 &&
+      aiCommunityRes.json?.answer?.includes('Technology for Everyone')
+  );
+
   // Summary
   console.log('\n======================================================');
   const passedCount = results.filter((r) => r.pass).length;

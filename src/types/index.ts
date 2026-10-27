@@ -181,3 +181,27 @@ export interface EstimatorScope {
   recommendedTech: string[];
   suggestedArchitecture: string;
 }
+
+export interface SocietyOffering {
+  id: string;
+  category: string;
+  title: string;
+  iconName: string;
+  badge: string;
+  description: string;
+  offerings: string[];
+  disclaimer?: string;
+}
+
+export interface CommunityPillar {
+  title: string;
+  tagline: string;
+  description: string;
+  iconName: string;
+}
+
+export interface CommunityWorkflowStep {
+  step: number;
+  title: string;
+  description: string;
+}
