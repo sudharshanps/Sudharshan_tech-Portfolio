@@ -17,6 +17,7 @@ export const ScheduleMeetingModal: React.FC<ScheduleMeetingModalProps> = ({ isOp
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [notes, setNotes] = useState('');
+  const [gotcha, setGotcha] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [referenceId, setReferenceId] = useState('');
@@ -35,6 +36,9 @@ export const ScheduleMeetingModal: React.FC<ScheduleMeetingModalProps> = ({ isOp
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError(null);
+
+    // Spam honeypot
+    if (gotcha) return;
 
     if (!fullName.trim() || !email.trim()) {
       setFormError('Please enter your full name and email address.');
@@ -65,6 +69,7 @@ Notes: ${notes || 'Standard 30-minute technical discovery session'}`;
           phone: phone.trim(),
           serviceType: 'Consultation Booking',
           projectDetails: bookingDetails,
+          _gotcha: gotcha,
         }),
       });
 
@@ -292,6 +297,18 @@ Notes: ${notes || 'Standard 30-minute technical discovery session'}`;
                     className="w-full px-3 py-2 bg-slate-50 rounded-xl border border-slate-200 text-xs font-mono focus:border-brand-blue focus:bg-white focus:outline-none resize-none"
                   />
                 </div>
+
+                {/* Anti-spam honeypot */}
+                <input
+                  type="text"
+                  name="_gotcha"
+                  value={gotcha}
+                  onChange={(e) => setGotcha(e.target.value)}
+                  tabIndex={-1}
+                  autoComplete="off"
+                  className="hidden"
+                  aria-hidden="true"
+                />
 
                 <div className="pt-2">
                   <Button

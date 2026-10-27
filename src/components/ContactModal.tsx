@@ -87,9 +87,9 @@ export const ContactModal: React.FC<ContactModalProps> = ({
         setErrorMessage(data.error || 'Failed to submit enquiry. Please check your inputs.');
       }
     } catch {
-      // Direct communication fallback
-      setReferenceId(`ST-REQ-${Date.now().toString(36).toUpperCase()}`);
-      setIsSubmitted(true);
+      setErrorMessage(
+        `Unable to reach the server. Please check your connection or contact Founder Sudharshan directly at ${COMPANY_INFO.email} or ${COMPANY_INFO.phone}.`
+      );
     } finally {
       setIsSubmitting(false);
     }

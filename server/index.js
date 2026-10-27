@@ -21,9 +21,47 @@ const __dirname = path.dirname(__filename);
 
 const PORT = parseInt(process.env.PORT || '5000', 10);
 const HOST = process.env.HOST || '0.0.0.0';
-const ADMIN_SECRET = process.env.ADMIN_SECRET || 'st_admin_secret_2026';
 const MONITORING_INTERVAL_MS = parseInt(process.env.MONITORING_INTERVAL_MS || '60000', 10);
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
+
+// Production-hardened Admin Secret configuration
+// In production, reject static default placeholder and generate an ephemeral secret if unset
+let effectiveAdminSecret = process.env.ADMIN_SECRET || 'st_admin_secret_2026';
+if (
+  process.env.NODE_ENV === 'production' &&
+  (!process.env.ADMIN_SECRET || process.env.ADMIN_SECRET === 'st_admin_secret_2026')
+) {
+  effectiveAdminSecret = crypto.randomBytes(32).toString('hex');
+  console.warn('\n[SECURITY ALERT] No secure ADMIN_SECRET provided in production mode.');
+  console.warn('[SECURITY ALERT] An ephemeral 64-character secret was automatically generated to protect admin endpoints.');
+  console.warn('[SECURITY ALERT] Configure a dedicated ADMIN_SECRET in your .env or platform secrets manager.\n');
+}
+const ADMIN_SECRET = effectiveAdminSecret;
+
+// Explicit CORS origin allowlist
+const ALLOWED_ORIGINS = new Set([
+  'http://localhost:3000',
+  'http://localhost:5173',
+  'http://localhost:5000',
+  'http://127.0.0.1:3000',
+  'http://127.0.0.1:5173',
+  'http://127.0.0.1:5000',
+]);
+
+if (FRONTEND_URL) {
+  try {
+    const origin = new URL(FRONTEND_URL).origin;
+    ALLOWED_ORIGINS.add(origin);
+  } catch {
+    // Ignore invalid FRONTEND_URL format
+  }
+}
+if (process.env.ADDITIONAL_ALLOWED_ORIGINS) {
+  process.env.ADDITIONAL_ALLOWED_ORIGINS.split(',').forEach((o) => {
+    const trimmed = o.trim();
+    if (trimmed) ALLOWED_ORIGINS.add(trimmed);
+  });
+}
 
 // Persistence file paths
 const HISTORY_FILE = path.join(__dirname, 'monitoring-history.json');
@@ -154,7 +192,7 @@ const DEFAULT_PULSE = [
   },
 ];
 
-// Atomic file write helper (writes to temp file, then atomically renames to prevent partial write corruption)
+// Atomic file write helper with Windows lock contention retry loop
 function safeWriteJsonSync(filePath, data) {
   const dir = path.dirname(filePath);
   const tempPath = path.join(
@@ -162,7 +200,24 @@ function safeWriteJsonSync(filePath, data) {
     `.${path.basename(filePath)}.tmp.${Date.now()}.${Math.random().toString(36).slice(2, 7)}`
   );
   fs.writeFileSync(tempPath, JSON.stringify(data, null, 2), 'utf8');
-  fs.renameSync(tempPath, filePath);
+  let retries = 5;
+  while (retries > 0) {
+    try {
+      fs.renameSync(tempPath, filePath);
+      return;
+    } catch (err) {
+      retries--;
+      if (retries === 0) {
+        try {
+          fs.unlinkSync(tempPath);
+        } catch {}
+        throw err;
+      }
+      // Busy-wait 8ms to let Windows OS file lock release
+      const stop = Date.now() + 8;
+      while (Date.now() < stop) {}
+    }
+  }
 }
 
 // Resilient file read helper with fallback
@@ -623,10 +678,11 @@ async function runScheduledHealthChecks() {
 setInterval(runScheduledHealthChecks, MONITORING_INTERVAL_MS);
 setTimeout(runScheduledHealthChecks, 3000);
 
-// Input Sanitization
+// Input Sanitization: Strips null bytes, non-printable control characters, and escapes dangerous HTML entities
 function sanitize(str) {
   if (typeof str !== 'string') return '';
   return str
+    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '') // Strip null bytes & ASCII control characters
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
@@ -635,24 +691,28 @@ function sanitize(str) {
     .trim();
 }
 
-// SSRF Safety Checker: Validates that an IP is not in loopback, link-local, carrier-grade NAT, or private RFC1918 ranges
+// SSRF Safety Checker: Validates that an IP is not in loopback, link-local, carrier-grade NAT, or private RFC ranges
 function isPrivateIp(ip) {
   if (typeof ip !== 'string') return true;
   const trimmed = ip.trim().toLowerCase();
 
-  // IPv4-mapped IPv6 check (e.g., ::ffff:127.0.0.1)
+  // IPv4-mapped IPv6 check (e.g., ::ffff:127.0.0.1 or ::ffff:7f00:1)
   if (trimmed.startsWith('::ffff:')) {
     const ipv4Part = trimmed.slice(7);
     return isPrivateIp(ipv4Part);
   }
 
-  // IPv6 checks
+  // IPv6 checks (Loopback, Link-Local fe80::/10, Unique Local fc00::/7, Discard 100::/64, Documentation 2001:db8::/32, Benchmark 2001:2::/48)
   if (
     trimmed === '::1' ||
     trimmed === '::' ||
     trimmed.startsWith('fe80:') ||
     trimmed.startsWith('fc') ||
-    trimmed.startsWith('fd')
+    trimmed.startsWith('fd') ||
+    trimmed.startsWith('100::') ||
+    trimmed.startsWith('2001:db8:') ||
+    trimmed.startsWith('2001:2:') ||
+    trimmed.startsWith('2002:') // 6to4 relay
   ) {
     return true;
   }
@@ -660,7 +720,7 @@ function isPrivateIp(ip) {
   // IPv4 checks
   const parts = trimmed.split('.').map(Number);
   if (parts.length === 4 && parts.every((n) => !isNaN(n) && n >= 0 && n <= 255)) {
-    // 0.0.0.0/8 (Current network)
+    // 0.0.0.0/8 (Current network / "this" host)
     if (parts[0] === 0) return true;
     // 10.0.0.0/8 (RFC1918 Private)
     if (parts[0] === 10) return true;
@@ -668,7 +728,7 @@ function isPrivateIp(ip) {
     if (parts[0] === 100 && parts[1] >= 64 && parts[1] <= 127) return true;
     // 127.0.0.0/8 (Loopback)
     if (parts[0] === 127) return true;
-    // 169.254.0.0/16 (Link-local / AWS / GCP Metadata)
+    // 169.254.0.0/16 (Link-local / Cloud metadata: AWS, GCP, Azure 169.254.169.254)
     if (parts[0] === 169 && parts[1] === 254) return true;
     // 172.16.0.0/12 (RFC1918 Private)
     if (parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31) return true;
@@ -676,6 +736,8 @@ function isPrivateIp(ip) {
     if (parts[0] === 192 && parts[1] === 0 && parts[2] === 0) return true;
     // 192.0.2.0/24 (TEST-NET-1)
     if (parts[0] === 192 && parts[1] === 0 && parts[2] === 2) return true;
+    // 192.88.99.0/24 (6to4 Relay Anycast, RFC 3068)
+    if (parts[0] === 192 && parts[1] === 88 && parts[2] === 99) return true;
     // 192.168.0.0/16 (RFC1918 Private)
     if (parts[0] === 192 && parts[1] === 168) return true;
     // 198.18.0.0/15 (Network benchmark tests)
@@ -691,7 +753,7 @@ function isPrivateIp(ip) {
   return false;
 }
 
-// Perform Preliminary Website Audit with strict SSRF defense & safe redirect validation
+// Perform Preliminary Website Audit with strict SSRF defense, port restrictions, DNS rebinding immunity, and safe redirect validation
 function runWebsiteAudit(targetUrl, maxRedirects = 2) {
   return new Promise((resolve) => {
     function executeAudit(currentUrl, redirectHops) {
@@ -708,12 +770,26 @@ function runWebsiteAudit(targetUrl, maxRedirects = 2) {
         return resolve({ error: 'Only HTTP and HTTPS protocols are supported.' });
       }
 
+      // Reject user credentials in target URL
+      if (parsed.username || parsed.password) {
+        return resolve({ error: 'Target URL must not contain embedded user credentials.' });
+      }
+
+      // Reject non-standard ports to prevent port scanning abuse
+      if (parsed.port && parsed.port !== '80' && parsed.port !== '443') {
+        return resolve({
+          error: `Port ${parsed.port} is not supported. Audits are strictly restricted to standard web ports (80, 443).`,
+        });
+      }
+
       const hostname = parsed.hostname;
       // Block common internal hostnames immediately
       if (
         hostname === 'localhost' ||
         hostname.endsWith('.local') ||
         hostname.endsWith('.internal') ||
+        hostname.endsWith('.onion') ||
+        hostname.endsWith('.corp') ||
         hostname === '127.0.0.1' ||
         hostname === '0.0.0.0'
       ) {
@@ -736,6 +812,10 @@ function runWebsiteAudit(targetUrl, maxRedirects = 2) {
           }
         }
 
+        // Pin the validated public IP address to prevent DNS Rebinding race conditions
+        const targetIp = addresses[0].address;
+        const isIpv6 = targetIp.includes(':');
+
         // Safe to fetch preliminary headers and page metadata
         const start = Date.now();
         const client = parsed.protocol === 'https:' ? https : http;
@@ -743,7 +823,13 @@ function runWebsiteAudit(targetUrl, maxRedirects = 2) {
         const req = client.get(
           parsed,
           {
+            lookup: (_host, _options, cb) => {
+              // Connect directly to the pre-verified public IP address
+              cb(null, targetIp, isIpv6 ? 6 : 4);
+            },
+            servername: parsed.hostname, // Preserves TLS SNI certificate validation
             headers: {
+              'Host': parsed.host,
               'User-Agent':
                 'Mozilla/5.0 (compatible; SUDHARSHAN_TECH-SiteAudit/2.5; +https://sudharshan-tech.com)',
               Accept: 'text/html,application/xhtml+xml',
@@ -765,16 +851,23 @@ function runWebsiteAudit(targetUrl, maxRedirects = 2) {
               } catch {
                 return resolve({ error: 'Target provided an invalid redirect location.' });
               }
-              // Safely recurse with incremented hop counter (re-validating DNS and SSRF on destination!)
+              // Safely recurse with incremented hop counter (re-validating DNS, ports, and SSRF on destination!)
               return executeAudit(nextUrl, redirectHops + 1);
             }
 
             const latency = Date.now() - start;
             let body = '';
+            let totalBytes = 0;
+            const MAX_BODY_BYTES = 256 * 1024; // 256 KB response body cap
             res.setEncoding('utf8');
 
             res.on('data', (chunk) => {
-              if (body.length < 256 * 1024) {
+              totalBytes += chunk.length;
+              if (totalBytes > MAX_BODY_BYTES) {
+                // Abort excessive streaming payload immediately to protect memory
+                req.destroy();
+                res.destroy();
+              } else {
                 body += chunk;
               }
             });
@@ -906,6 +999,23 @@ function runWebsiteAudit(targetUrl, maxRedirects = 2) {
   });
 }
 
+// Safe error responder: logs internal stack/message to server console with requestId, returning a generic safe error to clients
+function sendSafeError(res, err, context = 'Server Error', requestId = '') {
+  console.error(`[Internal Safety] [${requestId}] ${context}:`, err?.message || err);
+  if (!res.headersSent) {
+    res.writeHead(500, {
+      'Content-Type': 'application/json',
+      'Cache-Control': 'no-store, private',
+    });
+    res.end(
+      JSON.stringify({
+        error: 'An internal error occurred while processing your request. Please try again later.',
+        requestId: requestId || undefined,
+      })
+    );
+  }
+}
+
 // HTTP Server
 const server = http.createServer(async (req, res) => {
   const clientIp = req.socket.remoteAddress || 'unknown';
@@ -919,9 +1029,11 @@ const server = http.createServer(async (req, res) => {
   res.setHeader('X-Frame-Options', 'SAMEORIGIN');
   res.setHeader('X-XSS-Protection', '1; mode=block');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+  res.setHeader('Cross-Origin-Resource-Policy', 'same-origin');
   res.setHeader(
     'Content-Security-Policy',
-    "default-src 'self'; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https: blob:; font-src 'self' data: https:; connect-src 'self' https: http: ws: wss:; frame-ancestors 'self';"
+    "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https: blob:; font-src 'self' https://fonts.gstatic.com data:; connect-src 'self' ws: wss:; frame-ancestors 'self';"
   );
   res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=()');
 
@@ -930,18 +1042,28 @@ const server = http.createServer(async (req, res) => {
     res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
   }
 
-  // Production-Ready Dynamic CORS Configuration
+  // Production-Ready Strict Origin CORS Configuration
   const reqOrigin = req.headers.origin;
-  if (reqOrigin) {
+  if (reqOrigin && ALLOWED_ORIGINS.has(reqOrigin)) {
     res.setHeader('Access-Control-Allow-Origin', reqOrigin);
     res.setHeader('Vary', 'Origin');
-  } else {
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+  } else if (!reqOrigin) {
+    // Non-browser or direct same-origin requests
   }
+
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-admin-token, x-request-id');
 
   if (req.method === 'OPTIONS') {
+    if (reqOrigin && !ALLOWED_ORIGINS.has(reqOrigin)) {
+      res.writeHead(403, {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-store, private',
+      });
+      res.end(JSON.stringify({ error: 'CORS policy violation: Origin not allowed.' }));
+      return;
+    }
     res.writeHead(204);
     res.end();
     return;
@@ -1143,6 +1265,29 @@ const server = http.createServer(async (req, res) => {
           return;
         }
 
+        // Strict allowlist for payload fields
+        const ALLOWED_CONTACT_FIELDS = new Set([
+          'fullName',
+          'email',
+          'phone',
+          'company',
+          'serviceType',
+          'budgetRange',
+          'timeline',
+          'projectDetails',
+          'estimatorBrief',
+          '_gotcha',
+        ]);
+        const unknownKeys = Object.keys(data).filter((k) => !ALLOWED_CONTACT_FIELDS.has(k));
+        if (unknownKeys.length > 0) {
+          res.writeHead(400, {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-store, private',
+          });
+          res.end(JSON.stringify({ error: 'Request rejected: unauthorized or unexpected fields.' }));
+          return;
+        }
+
         // Strict length bounds and sanitization
         const fullName = sanitize((data.fullName || '').slice(0, 150));
         const email = sanitize((data.email || '').slice(0, 254));
@@ -1154,7 +1299,16 @@ const server = http.createServer(async (req, res) => {
         const projectDetails = sanitize((data.projectDetails || '').slice(0, 10000));
         const estimatorBrief = sanitize((data.estimatorBrief || '').slice(0, 10000));
 
-        if (!fullName || !email || (!projectDetails && !estimatorBrief)) {
+        if (!fullName || fullName.length < 2) {
+          res.writeHead(400, {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-store, private',
+          });
+          res.end(JSON.stringify({ error: 'Please enter a valid full name (minimum 2 characters).' }));
+          return;
+        }
+
+        if (!email || (!projectDetails && !estimatorBrief)) {
           res.writeHead(400, {
             'Content-Type': 'application/json',
             'Cache-Control': 'no-store, private',
@@ -1167,14 +1321,32 @@ const server = http.createServer(async (req, res) => {
           return;
         }
 
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
+        const emailRegex =
+          /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
+        if (!emailRegex.test(email) || email.length > 254) {
           res.writeHead(400, {
             'Content-Type': 'application/json',
             'Cache-Control': 'no-store, private',
           });
           res.end(JSON.stringify({ error: 'Invalid email address format.' }));
           return;
+        }
+
+        if (phone) {
+          const phoneRegex = /^[+]?[\d\s().-]{7,25}$/;
+          if (!phoneRegex.test(phone)) {
+            res.writeHead(400, {
+              'Content-Type': 'application/json',
+              'Cache-Control': 'no-store, private',
+            });
+            res.end(
+              JSON.stringify({
+                error:
+                  'Invalid phone number format. Allowed characters: digits, +, -, (), and spaces.',
+              })
+            );
+            return;
+          }
         }
 
         // Idempotency check: detect rapid duplicate submissions within 60s
@@ -1230,11 +1402,7 @@ const server = http.createServer(async (req, res) => {
           })
         );
       } catch (err) {
-        res.writeHead(500, {
-          'Content-Type': 'application/json',
-          'Cache-Control': 'no-store, private',
-        });
-        res.end(JSON.stringify({ error: err.message || 'Internal Server Error' }));
+        sendSafeError(res, err, 'Inquiry submission processing failed', requestId);
       }
     });
     return;
@@ -1375,11 +1543,7 @@ const server = http.createServer(async (req, res) => {
         })
       );
     } catch (e) {
-      res.writeHead(500, {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'no-store, private',
-      });
-      res.end(JSON.stringify({ error: `Failed to read inquiries: ${e.message}` }));
+      sendSafeError(res, e, 'Failed to read inquiries', requestId);
     }
     return;
   }
@@ -1412,11 +1576,7 @@ const server = http.createServer(async (req, res) => {
       });
       res.end(JSON.stringify({ success: true, deleted: targetRef, remainingCount: result.remainingCount }));
     } catch (e) {
-      res.writeHead(500, {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'no-store, private',
-      });
-      res.end(JSON.stringify({ error: `Failed to delete inquiry: ${e.message}` }));
+      sendSafeError(res, e, 'Failed to delete inquiry', requestId);
     }
     return;
   }
@@ -1431,11 +1591,7 @@ const server = http.createServer(async (req, res) => {
       });
       res.end(JSON.stringify({ success: true, count: data.length, changelog: data }));
     } catch (e) {
-      res.writeHead(500, {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'no-store, private',
-      });
-      res.end(JSON.stringify({ error: `Failed to read changelog: ${e.message}` }));
+      sendSafeError(res, e, 'Failed to read changelog', requestId);
     }
     return;
   }
@@ -1525,11 +1681,7 @@ const server = http.createServer(async (req, res) => {
       });
       res.end(JSON.stringify({ success: true, count: data.length, pulse: data }));
     } catch (e) {
-      res.writeHead(500, {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'no-store, private',
-      });
-      res.end(JSON.stringify({ error: `Failed to read project pulse: ${e.message}` }));
+      sendSafeError(res, e, 'Failed to read project pulse', requestId);
     }
     return;
   }
@@ -1646,4 +1798,4 @@ if (process.env.NODE_ENV !== 'test') {
   process.on('SIGTERM', () => handleShutdown('SIGTERM'));
 }
 
-export { server, isPrivateIp, sanitize, ADMIN_SECRET };
+export { server, isPrivateIp, sanitize, ADMIN_SECRET, ALLOWED_ORIGINS };

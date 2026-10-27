@@ -148,14 +148,17 @@ export const WebsiteAuditSection: React.FC<WebsiteAuditSectionProps> = ({
                 </span>
                 <h3 className="text-lg font-bold text-brand-navy flex items-center gap-2">
                   <span>{auditResult.targetUrl}</span>
-                  <a
-                    href={auditResult.targetUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-slate-400 hover:text-brand-blue text-xs"
-                  >
-                    <ExternalLink className="w-3.5 h-3.5" />
-                  </a>
+                  {(auditResult.targetUrl.startsWith('http://') ||
+                    auditResult.targetUrl.startsWith('https://')) && (
+                    <a
+                      href={auditResult.targetUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-slate-400 hover:text-brand-blue text-xs"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  )}
                 </h3>
                 <span className="text-xs font-mono text-slate-400">
                   Response: HTTP {auditResult.httpStatus} · Latency: {auditResult.responseLatencyMs}ms

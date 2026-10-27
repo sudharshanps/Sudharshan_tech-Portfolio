@@ -15,7 +15,9 @@ const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, '..');
 const serverIndexPath = path.join(rootDir, 'server', 'index.js');
 
-const { server, isPrivateIp, ADMIN_SECRET } = await import(pathToFileURL(serverIndexPath).href);
+const { server, isPrivateIp, sanitize, ADMIN_SECRET, ALLOWED_ORIGINS } = await import(
+  pathToFileURL(serverIndexPath).href
+);
 
 // Helper to simulate HTTP requests against the Node http.Server listener directly
 function dispatch(server, { method, url, headers = {}, body = null, remoteAddress = '127.0.0.1' }) {
@@ -505,6 +507,14 @@ async function runSuite() {
     'Response contains Permissions-Policy header',
     Boolean(secHeadersRes.headers['permissions-policy'])
   );
+  assert(
+    'Response contains Cross-Origin-Opener-Policy: same-origin',
+    secHeadersRes.headers['cross-origin-opener-policy'] === 'same-origin'
+  );
+  assert(
+    'Response contains Cross-Origin-Resource-Policy: same-origin',
+    secHeadersRes.headers['cross-origin-resource-policy'] === 'same-origin'
+  );
 
   // 18. Caching Strategy Audit (Public vs Private)
   console.log('\n--- Auditing Caching Strategy Headers ---');
@@ -535,6 +545,146 @@ async function runSuite() {
     'GET /api/inquiries strictly forbids public caching (no-store, private)',
     adminInqCacheRes.headers['cache-control']?.includes('no-store') &&
       adminInqCacheRes.headers['cache-control']?.includes('private')
+  );
+
+  // 19. Strict CORS Origin Allowlist Auditing
+  console.log('\n--- Auditing Strict CORS Origin Policy ---');
+  const corsDisallowedRes = await dispatch(server, {
+    method: 'GET',
+    url: '/api/health',
+    headers: { origin: 'https://malicious-attacker-site.com' },
+  });
+  assert(
+    'CORS rejects unauthorized origin by omitting Access-Control-Allow-Origin',
+    corsDisallowedRes.headers['access-control-allow-origin'] === undefined
+  );
+
+  const corsPreflightReject = await dispatch(server, {
+    method: 'OPTIONS',
+    url: '/api/contact',
+    headers: {
+      origin: 'https://unauthorized-cross-origin.com',
+      'access-control-request-method': 'POST',
+    },
+  });
+  assert(
+    'CORS preflight OPTIONS for unauthorized origin returns HTTP 403',
+    corsPreflightReject.statusCode === 403
+  );
+
+  const corsAllowedRes = await dispatch(server, {
+    method: 'GET',
+    url: '/api/health',
+    headers: { origin: 'http://localhost:3000' },
+  });
+  assert(
+    'CORS permits whitelisted localhost origin with credentials',
+    corsAllowedRes.headers['access-control-allow-origin'] === 'http://localhost:3000' &&
+      corsAllowedRes.headers['access-control-allow-credentials'] === 'true'
+  );
+
+  // 20. Audit Tool SSRF Port Restriction & Credential Defense
+  console.log('\n--- Auditing Extended SSRF & Port Restrictions ---');
+  const portScanRes = await dispatch(server, {
+    method: 'POST',
+    url: '/api/audit',
+    body: { targetUrl: 'http://8.8.8.8:22/ssh-banner' },
+  });
+  assert(
+    'SSRF defense blocks non-standard port 22',
+    portScanRes.statusCode === 400 && portScanRes.json?.error?.includes('Port 22 is not supported')
+  );
+
+  const portScanRedis = await dispatch(server, {
+    method: 'POST',
+    url: '/api/audit',
+    body: { targetUrl: 'http://8.8.8.8:6379/redis' },
+  });
+  assert(
+    'SSRF defense blocks non-standard port 6379',
+    portScanRedis.statusCode === 400 && portScanRedis.json?.error?.includes('Port 6379 is not supported')
+  );
+
+  const credUrlRes = await dispatch(server, {
+    method: 'POST',
+    url: '/api/audit',
+    body: { targetUrl: 'http://admin:secret@8.8.8.8/' },
+  });
+  assert(
+    'SSRF defense blocks embedded user credentials in target URL',
+    credUrlRes.statusCode === 400 && credUrlRes.json?.error?.includes('credentials')
+  );
+
+  // 21. Contact Form Payload Allowlist & Phone Format Validation
+  console.log('\n--- Auditing Contact Form Security & Strict Schema ---');
+  const unexpectedKeyRes = await dispatch(server, {
+    method: 'POST',
+    url: '/api/contact',
+    remoteAddress: '203.0.113.150',
+    body: {
+      fullName: 'Security Auditor',
+      email: 'auditor@test.com',
+      projectDetails: 'Testing field allowlisting',
+      injectedField: 'malicious-data-attribute',
+    },
+  });
+  assert(
+    'Contact API rejects unexpected/unauthorized payload fields (HTTP 400)',
+    unexpectedKeyRes.statusCode === 400 &&
+      unexpectedKeyRes.json?.error?.includes('unauthorized or unexpected fields')
+  );
+
+  const invalidPhoneRes = await dispatch(server, {
+    method: 'POST',
+    url: '/api/contact',
+    remoteAddress: '203.0.113.150',
+    body: {
+      fullName: 'Security Auditor',
+      email: 'auditor@test.com',
+      phone: '<script>alert("xss")</script>',
+      projectDetails: 'Testing phone sanitization and validation',
+    },
+  });
+  assert(
+    'Contact API rejects invalid phone format with script characters (HTTP 400)',
+    invalidPhoneRes.statusCode === 400 &&
+      invalidPhoneRes.json?.error?.includes('Invalid phone number format')
+  );
+
+  const validPhoneRes = await dispatch(server, {
+    method: 'POST',
+    url: '/api/contact',
+    remoteAddress: '203.0.113.150',
+    body: {
+      fullName: 'Security Auditor',
+      email: 'auditor-phone-valid@test.com',
+      phone: '+91 97914 95418',
+      projectDetails: 'Testing valid international phone number format',
+    },
+  });
+  assert(
+    'Contact API accepts valid international phone number format (HTTP 200)',
+    validPhoneRes.statusCode === 200 && validPhoneRes.json?.success === true
+  );
+  if (validPhoneRes.json?.referenceId) {
+    await dispatch(server, {
+      method: 'DELETE',
+      url: `/api/inquiries/${encodeURIComponent(validPhoneRes.json.referenceId)}`,
+      headers: { 'x-admin-token': ADMIN_SECRET },
+    });
+  }
+
+  // 22. Null Byte & Control Character Sanitization
+  console.log('\n--- Auditing Input Sanitization & Control Character Neutralization ---');
+  const dirtyInput = 'SUDHARSHAN\x00_TECH\x1B[31m_Security\x08Test<script>alert(1)</script>';
+  const cleanInput = sanitize(dirtyInput);
+  assert(
+    'Sanitize function strips null bytes and unprintable control characters',
+    !cleanInput.includes('\x00') && !cleanInput.includes('\x08') && !cleanInput.includes('\x1B')
+  );
+  assert(
+    'Sanitize function encodes HTML angle brackets into safe character entities',
+    cleanInput.includes('&lt;script&gt;')
   );
 
   // Summary
