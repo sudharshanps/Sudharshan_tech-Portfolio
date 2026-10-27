@@ -79,12 +79,12 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose, on
               <div className="relative rounded-2xl overflow-hidden border border-slate-200 aspect-[16/9] sm:aspect-[2/1] bg-slate-950 shadow-sm">
                 <img
                   src={project.image}
-                  alt={`${project.title} Interface Preview`}
+                  alt={project.imageAlt || `${project.title} Interface Preview`}
                   className="w-full h-full object-cover object-top"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
                 <div className="absolute bottom-2.5 right-3 px-2 py-0.5 rounded bg-slate-900/80 backdrop-blur-md text-[10px] font-mono text-slate-300 border border-slate-700/60 shadow-sm">
-                  High-Resolution Interface Preview
+                  {project.id === 'nidhi-setu' ? 'Civic Tech Theme Visual Reference' : 'High-Resolution Interface Preview'}
                 </div>
               </div>
             ) : (

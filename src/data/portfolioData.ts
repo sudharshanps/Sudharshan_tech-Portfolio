@@ -219,6 +219,9 @@ export const PROJECTS_DATA: Project[] = [
     teamContribution:
       'Eligibility matching algorithm, responsive interface development, and scheme classification data structure.',
     metricsOrHighlight: 'Public Service Welfare Discovery Engine',
+    image: '/assets/projects/nidhi-setu-government-portal.png',
+    imageFit: 'cover',
+    imageAlt: 'Government portal reference image for the NIDHI SETU civic technology prototype',
   },
 ];
 

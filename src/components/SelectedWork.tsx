@@ -83,7 +83,7 @@ export const SelectedWork: React.FC<SelectedWorkProps> = ({ onSelectProject }) =
                         <>
                           <img
                             src={project.image}
-                            alt={`${project.title} Preview`}
+                            alt={project.imageAlt || `${project.title} Preview`}
                             className="w-full h-full object-cover object-top transition-transform duration-300 ease-out group-hover:scale-105"
                             loading="lazy"
                           />

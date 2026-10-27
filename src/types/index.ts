@@ -27,6 +27,7 @@ export interface Project {
   metricsOrHighlight?: string;
   image?: string;
   imageFit?: 'cover' | 'contain';
+  imageAlt?: string;
   // Project Pulse fields
   pulseStage: PulseStage;
   lastUpdated: string;
