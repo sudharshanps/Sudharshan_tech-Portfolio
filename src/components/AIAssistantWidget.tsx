@@ -14,7 +14,9 @@ interface ChatMessage {
   timestamp: string;
 }
 
-export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({ onOpenEnquiry }) => {
+export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({
+  onOpenEnquiry,
+}: AIAssistantWidgetProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
@@ -217,7 +219,7 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({ onOpenEnqu
             {/* Input Bar & Conversion CTA */}
             <div className="p-3 bg-white border-t border-slate-100 space-y-2">
               <form
-                onSubmit={(e) => {
+                onSubmit={(e: React.FormEvent) => {
                   e.preventDefault();
                   handleSend();
                 }}
@@ -226,7 +228,7 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({ onOpenEnqu
                 <input
                   type="text"
                   value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInputValue(e.target.value)}
                   placeholder="Ask a technical or service question..."
                   className="flex-1 px-3 py-2 bg-slate-50 rounded-xl border border-slate-200 text-xs font-mono focus:outline-none focus:border-brand-blue focus:bg-white"
                 />

@@ -15,7 +15,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({
   isOpen,
   onClose,
   preselectedService = 'Web Development',
-}) => {
+}: ContactModalProps) => {
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -174,7 +174,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({
                   type="text"
                   name="_gotcha"
                   value={formData._gotcha}
-                  onChange={(e) => setFormData({ ...formData, _gotcha: e.target.value })}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, _gotcha: e.target.value })}
                   className="hidden"
                   tabIndex={-1}
                 />
@@ -194,7 +194,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({
                     type="text"
                     required
                     value={formData.fullName}
-                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, fullName: e.target.value })}
                     placeholder="Enter your full name"
                     className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-brand-blue focus:ring-1 focus:ring-brand-blue"
                   />
@@ -209,7 +209,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({
                       type="email"
                       required
                       value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, email: e.target.value })}
                       placeholder="you@company.com"
                       className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-brand-blue focus:ring-1 focus:ring-brand-blue"
                     />
@@ -222,7 +222,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({
                     <input
                       type="tel"
                       value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, phone: e.target.value })}
                       placeholder="+91 98765 43210"
                       className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-brand-blue focus:ring-1 focus:ring-brand-blue"
                     />
@@ -235,7 +235,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({
                   </label>
                   <select
                     value={formData.serviceType}
-                    onChange={(e) => setFormData({ ...formData, serviceType: e.target.value })}
+                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({ ...formData, serviceType: e.target.value })}
                     className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-brand-blue focus:ring-1 focus:ring-brand-blue bg-white"
                   >
                     {SERVICES_DATA.map((s) => (
@@ -256,7 +256,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({
                     rows={3}
                     required
                     value={formData.details}
-                    onChange={(e) => setFormData({ ...formData, details: e.target.value })}
+                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData({ ...formData, details: e.target.value })}
                     placeholder="Tell us what you're planning to build..."
                     className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-brand-blue focus:ring-1 focus:ring-brand-blue"
                   />

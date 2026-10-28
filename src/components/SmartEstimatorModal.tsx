@@ -23,7 +23,7 @@ export const SmartEstimatorModal: React.FC<SmartEstimatorModalProps> = ({
   isOpen,
   onClose,
   onTransferToInquiry,
-}) => {
+}: SmartEstimatorModalProps) => {
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [selectedServiceId, setSelectedServiceId] = useState<string>('web-dev');
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([

@@ -22,7 +22,7 @@ interface StatusPageProps {
   onBack: () => void;
 }
 
-export const StatusPage: React.FC<StatusPageProps> = ({ onBack }) => {
+export const StatusPage: React.FC<StatusPageProps> = ({ onBack }: StatusPageProps) => {
   const [services, setServices] = useState<MonitoredService[]>(INITIAL_MONITORED_SERVICES);
   const [incidents] = useState<Incident[]>(INITIAL_INCIDENTS);
   const [lastChecked, setLastChecked] = useState<string>(new Date().toISOString());

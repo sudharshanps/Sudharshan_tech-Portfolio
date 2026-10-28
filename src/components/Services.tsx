@@ -20,7 +20,7 @@ interface ServicesProps {
   onSelectServiceForInquiry: (serviceName: string) => void;
 }
 
-export const Services: React.FC<ServicesProps> = ({ onSelectServiceForInquiry }) => {
+export const Services: React.FC<ServicesProps> = ({ onSelectServiceForInquiry }: ServicesProps) => {
   const [expandedServiceId, setExpandedServiceId] = useState<string | null>(null);
 
   const getServiceIcon = (iconName: string) => {

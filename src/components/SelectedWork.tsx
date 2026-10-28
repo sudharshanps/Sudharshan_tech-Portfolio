@@ -10,7 +10,7 @@ interface SelectedWorkProps {
   onSelectProject: (project: Project) => void;
 }
 
-export const SelectedWork: React.FC<SelectedWorkProps> = ({ onSelectProject }) => {
+export const SelectedWork: React.FC<SelectedWorkProps> = ({ onSelectProject }: SelectedWorkProps) => {
   const [filter, setFilter] = useState<'all' | 'client' | 'ai' | 'prototypes'>('all');
 
   const filteredProjects = PROJECTS_DATA.filter((project) => {

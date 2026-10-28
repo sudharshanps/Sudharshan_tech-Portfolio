@@ -17,7 +17,7 @@ interface ChangelogPageProps {
   onBack: () => void;
 }
 
-export const ChangelogPage: React.FC<ChangelogPageProps> = ({ onBack }) => {
+export const ChangelogPage: React.FC<ChangelogPageProps> = ({ onBack }: ChangelogPageProps) => {
   const [entries, setEntries] = useState<ChangelogEntry[]>(CHANGELOG_DATA);
   const [selectedProject, setSelectedProject] = useState<string>('all');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -133,7 +133,7 @@ export const ChangelogPage: React.FC<ChangelogPageProps> = ({ onBack }) => {
             <input
               type="text"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
               placeholder="Search release notes, features, or git commit hashes..."
               className="w-full pl-10 pr-4 py-2.5 bg-white rounded-xl border border-slate-200 text-xs font-mono focus:border-brand-blue focus:outline-none focus:ring-1 focus:ring-brand-blue shadow-xs"
             />
@@ -174,7 +174,7 @@ export const ChangelogPage: React.FC<ChangelogPageProps> = ({ onBack }) => {
               </span>
               <select
                 value={selectedProject}
-                onChange={(e) => setSelectedProject(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedProject(e.target.value)}
                 className="bg-slate-100 rounded-md border border-slate-200 px-2 py-1 text-xs font-mono text-brand-navy focus:outline-none focus:ring-1 focus:ring-brand-blue w-full sm:w-auto cursor-pointer"
               >
                 <option value="all">All Projects</option>

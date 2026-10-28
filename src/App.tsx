@@ -110,7 +110,7 @@ export const App: React.FC = () => {
     handleSelectServiceForInquiry(serviceName);
   };
 
-  const handleStartInquiryWithAudit = (url: string, score: number) => {
+  const handleStartInquiryWithAudit = (url: string, score: number): void => {
     const serviceName = 'Cybersecurity & Code Hardening';
     setSelectedService(serviceName);
     setTransferredBrief(
@@ -206,7 +206,7 @@ export const App: React.FC = () => {
         <Hero onOpenContactModal={() => handleOpenContactModal()} />
 
         {/* 02 — Selected Work with Project Pulse */}
-        <SelectedWork onSelectProject={(project) => setActiveProjectModal(project)} />
+        <SelectedWork onSelectProject={(project: Project) => setActiveProjectModal(project)} />
 
         {/* 03 — Services */}
         <Services onSelectServiceForInquiry={handleSelectServiceForInquiry} />

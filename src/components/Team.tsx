@@ -8,7 +8,7 @@ interface TeamProps {
   onOpenContactModal: () => void;
 }
 
-export const Team: React.FC<TeamProps> = ({ onOpenContactModal }) => {
+export const Team: React.FC<TeamProps> = ({ onOpenContactModal }: TeamProps) => {
   return (
     <section id="team" className="py-16 md:py-20 bg-brand-slate-soft border-t border-slate-200/80">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">

@@ -13,7 +13,7 @@ export const NotFoundPage: React.FC<NotFoundPageProps> = ({
   onBack,
   onNavigateStatus,
   onNavigateChangelog,
-}) => {
+}: NotFoundPageProps) => {
   return (
     <div className="min-h-[80vh] flex items-center justify-center py-24 px-4 sm:px-6 lg:px-8 bg-slate-50">
       <motion.div

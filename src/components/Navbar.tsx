@@ -27,7 +27,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenContactModal,
   onNavigate,
   currentView,
-}) => {
+}: NavbarProps) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('hero');
@@ -117,7 +117,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Logo container: official uploaded logo */}
           <a
             href="#hero"
-            onClick={(e) => handleNavClick(e, '#hero')}
+            onClick={(e: React.MouseEvent<HTMLAnchorElement>) => handleNavClick(e, '#hero')}
             className="group flex items-center gap-2.5 transition-opacity duration-200 focus-visible:ring-2 focus-visible:ring-brand-blue rounded-lg p-1 -ml-1"
             aria-label="SUDHARSHAN_TECH Home"
           >
@@ -141,7 +141,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <a
                   key={link.name}
                   href={link.href}
-                  onClick={(e) => handleNavClick(e, link.href)}
+                  onClick={(e: React.MouseEvent<HTMLAnchorElement>) => handleNavClick(e, link.href)}
                   onMouseEnter={() => setHoveredLink(link.href)}
                   onMouseLeave={() => setHoveredLink(null)}
                   className={`relative px-2.5 xl:px-3 py-1.5 text-xs font-medium transition-colors duration-200 rounded-md focus-visible:ring-2 focus-visible:ring-brand-blue ${
@@ -246,7 +246,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   <a
                     key={link.name}
                     href={link.href}
-                    onClick={(e) => handleNavClick(e, link.href)}
+                    onClick={(e: React.MouseEvent<HTMLAnchorElement>) => handleNavClick(e, link.href)}
                     className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                       isActive
                         ? 'bg-blue-50 text-brand-blue font-semibold'

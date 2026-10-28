@@ -10,7 +10,11 @@ interface ProjectModalProps {
   onStartInquiry: () => void;
 }
 
-export const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose, onStartInquiry }) => {
+export const ProjectModal: React.FC<ProjectModalProps> = ({
+  project,
+  onClose,
+  onStartInquiry,
+}: ProjectModalProps) => {
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();

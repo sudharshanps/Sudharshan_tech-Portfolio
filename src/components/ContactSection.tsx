@@ -21,7 +21,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
   initialTimeline = '',
   onOpenEstimator,
   onOpenScheduler,
-}) => {
+}: ContactSectionProps) => {
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',

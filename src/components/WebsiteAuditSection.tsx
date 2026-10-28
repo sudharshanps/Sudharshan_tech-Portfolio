@@ -14,13 +14,13 @@ import { AuditReport } from '../types';
 import { Button } from './ui/Button';
 import { getApiUrl } from '../utils/api';
 
-interface WebsiteAuditSectionProps {
+export interface WebsiteAuditSectionProps {
   onStartInquiryWithAudit?: (url: string, score: number) => void;
 }
 
 export const WebsiteAuditSection: React.FC<WebsiteAuditSectionProps> = ({
   onStartInquiryWithAudit,
-}) => {
+}: WebsiteAuditSectionProps) => {
   const [urlInput, setUrlInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -93,7 +93,7 @@ export const WebsiteAuditSection: React.FC<WebsiteAuditSectionProps> = ({
                 <input
                   type="text"
                   value={urlInput}
-                  onChange={(e) => setUrlInput(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUrlInput(e.target.value)}
                   placeholder="https://yourcompany.com"
                   className="w-full pl-10 pr-4 py-3 bg-slate-50 rounded-xl border border-slate-200 text-xs sm:text-sm font-mono focus:border-brand-blue focus:bg-white focus:outline-none focus:ring-1 focus:ring-brand-blue"
                   disabled={isLoading}

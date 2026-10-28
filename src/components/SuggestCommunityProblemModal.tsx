@@ -14,7 +14,7 @@ export const SuggestCommunityProblemModal: React.FC<SuggestCommunityProblemModal
   isOpen,
   onClose,
   initialSupportType = 'Civic / Community Problem to Solve',
-}) => {
+}: SuggestCommunityProblemModalProps) => {
   const [fullName, setFullName] = useState('');
   const [organization, setOrganization] = useState('');
   const [email, setEmail] = useState('');
@@ -220,7 +220,7 @@ ${additionalDetails.trim() || 'None specified.'}`;
                   type="text"
                   name="_gotcha"
                   value={gotcha}
-                  onChange={(e) => setGotcha(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGotcha(e.target.value)}
                   className="hidden"
                   tabIndex={-1}
                   autoComplete="off"
@@ -246,7 +246,7 @@ ${additionalDetails.trim() || 'None specified.'}`;
                       type="text"
                       required
                       value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFullName(e.target.value)}
                       placeholder="e.g. Anandha Kumar"
                       className="w-full px-3 py-2 bg-slate-50 rounded-xl border border-slate-200 text-xs sm:text-sm focus:border-brand-blue focus:bg-white focus:outline-none"
                     />
@@ -260,7 +260,7 @@ ${additionalDetails.trim() || 'None specified.'}`;
                       type="email"
                       required
                       value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
                       placeholder="you@community.org"
                       className="w-full px-3 py-2 bg-slate-50 rounded-xl border border-slate-200 text-xs sm:text-sm focus:border-brand-blue focus:bg-white focus:outline-none"
                     />
@@ -275,7 +275,7 @@ ${additionalDetails.trim() || 'None specified.'}`;
                     <input
                       type="text"
                       value={organization}
-                      onChange={(e) => setOrganization(e.target.value)}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOrganization(e.target.value)}
                       placeholder="e.g. Coimbatore Farmers Forum / College Club"
                       className="w-full px-3 py-2 bg-slate-50 rounded-xl border border-slate-200 text-xs sm:text-sm focus:border-brand-blue focus:bg-white focus:outline-none"
                     />
@@ -287,7 +287,7 @@ ${additionalDetails.trim() || 'None specified.'}`;
                     </label>
                     <select
                       value={supportType}
-                      onChange={(e) => setSupportType(e.target.value)}
+                      onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSupportType(e.target.value)}
                       className="w-full px-3 py-2 bg-slate-50 rounded-xl border border-slate-200 text-xs font-mono focus:border-brand-blue focus:bg-white focus:outline-none"
                     >
                       <option>Digital Support for Local Business</option>
@@ -309,7 +309,7 @@ ${additionalDetails.trim() || 'None specified.'}`;
                     rows={3}
                     required
                     value={problemDescription}
-                    onChange={(e) => setProblemDescription(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setProblemDescription(e.target.value)}
                     placeholder="Describe the real-world bottleneck or digital challenge you are facing..."
                     className="w-full px-3 py-2 bg-slate-50 rounded-xl border border-slate-200 text-xs sm:text-sm focus:border-brand-blue focus:bg-white focus:outline-none"
                   />
@@ -322,7 +322,7 @@ ${additionalDetails.trim() || 'None specified.'}`;
                   <textarea
                     rows={2}
                     value={additionalDetails}
-                    onChange={(e) => setAdditionalDetails(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setAdditionalDetails(e.target.value)}
                     placeholder="Existing tools used, timeline expectations, or links..."
                     className="w-full px-3 py-2 bg-slate-50 rounded-xl border border-slate-200 text-xs sm:text-sm focus:border-brand-blue focus:bg-white focus:outline-none"
                   />

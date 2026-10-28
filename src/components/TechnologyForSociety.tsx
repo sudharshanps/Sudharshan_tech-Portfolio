@@ -31,7 +31,7 @@ interface TechnologyForSocietyProps {
 export const TechnologyForSociety: React.FC<TechnologyForSocietyProps> = ({
   onCollaborate,
   onOpenSuggestModal,
-}) => {
+}: TechnologyForSocietyProps) => {
   const getOfferingIcon = (iconName: string) => {
     switch (iconName) {
       case 'Store':

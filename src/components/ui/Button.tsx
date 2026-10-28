@@ -33,7 +33,7 @@ export const Button: React.FC<ButtonProps> = ({
   ariaLabel,
   target,
   rel,
-}) => {
+}: ButtonProps) => {
   // Base styling tokens - compact, refined, no layout shifts
   const baseClasses =
     'relative inline-flex items-center justify-center font-medium rounded-lg select-none text-center cursor-pointer transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-blue disabled:opacity-60 disabled:cursor-not-allowed active:scale-[0.99]';

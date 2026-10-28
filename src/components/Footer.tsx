@@ -16,7 +16,7 @@ interface FooterProps {
   onNavigate?: (view: 'home' | 'status' | 'changelog' | 'not-found') => void;
 }
 
-export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
+export const Footer: React.FC<FooterProps> = ({ onNavigate }: FooterProps) => {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -112,7 +112,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             <ul className="space-y-2 text-xs text-slate-400">
               <li>
                 <button
-                  onClick={(e) => handleLinkClick(e, 'status')}
+                  onClick={(e: React.MouseEvent) => handleLinkClick(e, 'status')}
                   className="hover:text-white transition-colors flex items-center gap-1.5 cursor-pointer text-left"
                 >
                   <Activity className="w-3.5 h-3.5 text-emerald-400" />
@@ -121,7 +121,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
               </li>
               <li>
                 <button
-                  onClick={(e) => handleLinkClick(e, 'changelog')}
+                  onClick={(e: React.MouseEvent) => handleLinkClick(e, 'changelog')}
                   className="hover:text-white transition-colors flex items-center gap-1.5 cursor-pointer text-left"
                 >
                   <GitCommit className="w-3.5 h-3.5 text-brand-blue-glow" />
@@ -197,7 +197,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             <span>© {new Date().getFullYear()} SUDHARSHAN_TECH. All rights reserved. Founded by Sudharshan.P.S.</span>
             <span className="hidden md:inline">•</span>
             <button
-              onClick={(e) => handleLinkClick(e, 'status')}
+              onClick={(e: React.MouseEvent) => handleLinkClick(e, 'status')}
               className="text-slate-400 hover:text-white hover:underline cursor-pointer"
             >
               System Status: 100% Operational

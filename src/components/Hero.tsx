@@ -8,7 +8,7 @@ interface HeroProps {
   onOpenContactModal: () => void;
 }
 
-export const Hero: React.FC<HeroProps> = ({ onOpenContactModal }) => {
+export const Hero: React.FC<HeroProps> = ({ onOpenContactModal }: HeroProps) => {
   const scrollToWork = (e: React.MouseEvent) => {
     e.preventDefault();
     const el = document.getElementById('work');

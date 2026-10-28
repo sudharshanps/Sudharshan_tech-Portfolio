@@ -9,7 +9,10 @@ interface ScheduleMeetingModalProps {
   onClose: () => void;
 }
 
-export const ScheduleMeetingModal: React.FC<ScheduleMeetingModalProps> = ({ isOpen, onClose }) => {
+export const ScheduleMeetingModal: React.FC<ScheduleMeetingModalProps> = ({
+  isOpen,
+  onClose,
+}: ScheduleMeetingModalProps) => {
   const [selectedTopic, setSelectedTopic] = useState('New Project Architecture & Feasibility');
   const [selectedTimezone, setSelectedTimezone] = useState('Asia/Kolkata (IST, UTC+5:30)');
   const [selectedSlot, setSelectedSlot] = useState('11:00 AM — 11:45 AM');
@@ -194,7 +197,7 @@ Notes: ${notes || 'Standard 30-minute technical discovery session'}`;
                   </label>
                   <select
                     value={selectedTopic}
-                    onChange={(e) => setSelectedTopic(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedTopic(e.target.value)}
                     className="w-full px-3 py-2 bg-slate-50 rounded-xl border border-slate-200 text-xs font-mono focus:border-brand-blue focus:bg-white focus:outline-none"
                   >
                     <option>New Project Architecture & Feasibility</option>
@@ -212,7 +215,7 @@ Notes: ${notes || 'Standard 30-minute technical discovery session'}`;
                     </label>
                     <select
                       value={selectedTimezone}
-                      onChange={(e) => setSelectedTimezone(e.target.value)}
+                      onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedTimezone(e.target.value)}
                       className="w-full px-3 py-2 bg-slate-50 rounded-xl border border-slate-200 text-xs font-mono focus:border-brand-blue focus:bg-white focus:outline-none"
                     >
                       <option>Asia/Kolkata (IST, UTC+5:30)</option>
@@ -230,7 +233,7 @@ Notes: ${notes || 'Standard 30-minute technical discovery session'}`;
                     </label>
                     <select
                       value={selectedSlot}
-                      onChange={(e) => setSelectedSlot(e.target.value)}
+                      onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedSlot(e.target.value)}
                       className="w-full px-3 py-2 bg-slate-50 rounded-xl border border-slate-200 text-xs font-mono focus:border-brand-blue focus:bg-white focus:outline-none"
                     >
                       <option>10:00 AM — 10:45 AM</option>
@@ -251,7 +254,7 @@ Notes: ${notes || 'Standard 30-minute technical discovery session'}`;
                       type="text"
                       required
                       value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFullName(e.target.value)}
                       placeholder="e.g. Anand Kumar"
                       className="w-full px-3 py-2 bg-slate-50 rounded-xl border border-slate-200 text-xs font-mono focus:border-brand-blue focus:bg-white focus:outline-none"
                     />
@@ -265,7 +268,7 @@ Notes: ${notes || 'Standard 30-minute technical discovery session'}`;
                       type="email"
                       required
                       value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
                       placeholder="you@company.com"
                       className="w-full px-3 py-2 bg-slate-50 rounded-xl border border-slate-200 text-xs font-mono focus:border-brand-blue focus:bg-white focus:outline-none"
                     />
@@ -279,7 +282,7 @@ Notes: ${notes || 'Standard 30-minute technical discovery session'}`;
                   <input
                     type="tel"
                     value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPhone(e.target.value)}
                     placeholder="+91 98765 43210"
                     className="w-full px-3 py-2 bg-slate-50 rounded-xl border border-slate-200 text-xs font-mono focus:border-brand-blue focus:bg-white focus:outline-none"
                   />
@@ -292,7 +295,7 @@ Notes: ${notes || 'Standard 30-minute technical discovery session'}`;
                   <textarea
                     rows={2}
                     value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setNotes(e.target.value)}
                     placeholder="Briefly describe what you would like to discuss..."
                     className="w-full px-3 py-2 bg-slate-50 rounded-xl border border-slate-200 text-xs font-mono focus:border-brand-blue focus:bg-white focus:outline-none resize-none"
                   />
@@ -303,7 +306,7 @@ Notes: ${notes || 'Standard 30-minute technical discovery session'}`;
                   type="text"
                   name="_gotcha"
                   value={gotcha}
-                  onChange={(e) => setGotcha(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGotcha(e.target.value)}
                   tabIndex={-1}
                   autoComplete="off"
                   className="hidden"
