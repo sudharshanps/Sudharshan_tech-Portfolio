@@ -1,121 +1,227 @@
-# SUDHARSHAN_TECH — Company Portfolio Blueprint & Platform
 
-Official corporate portfolio website for **SUDHARSHAN_TECH**, an independent technology company based in Coimbatore, Tamil Nadu, India.
+<div align="center">
 
-> **Motto:** Code. Create. Elevate.  
-> **Brand Palette:** Electric Blue (`#2563EB`), Deep Navy (`#0F172A`), Pure White (`#FFFFFF`), Soft Slate (`#F8FAFC`).  
-> **Direct Leadership:** Sudharshan.P.S (Founder & CEO)
+<img src="https://capsule-render.vercel.app/api?type=venom&height=240&color=0:0F172A,50:1D4ED8,100:2563EB&text=SUDHARSHAN_TECH&fontColor=FFFFFF&fontSize=42&fontAlignY=42&desc=CODE.%20CREATE.%20ELEVATE.&descAlignY=62&descSize=18&animation=fadeIn&stroke=2563EB&strokeWidth=2" width="100%" alt="SUDHARSHAN_TECH animated blue banner"/>
 
----
+# SUDHARSHAN_TECH
+### Code. Create. Elevate.
 
-## 🚀 Overview & Key Highlights
+**Building digital experiences through software engineering, AI, cloud technologies, and cybersecurity.**
 
-This platform is engineered to:
-1. **Build Trust** — Showcase verified client projects, production capabilities, and disciplined engineering pipelines.
-2. **Attract Clients** — Frame technical capabilities in terms of real business needs and measurable ROI.
-3. **Generate Opportunities** — Provide streamlined consultation and project enquiry workflows with guaranteed 24-hour turnaround.
+[![Portfolio](https://img.shields.io/badge/Portfolio-2563EB?style=for-the-badge&logo=googlechrome&logoColor=white)](https://sudharshantech.com)
+[![GitHub](https://img.shields.io/badge/GitHub-0F172A?style=for-the-badge&logo=github&logoColor=white)](https://github.com/sudharshanps)
+[![Instagram](https://img.shields.io/badge/Instagram-2563EB?style=for-the-badge&logo=instagram&logoColor=white)](https://www.instagram.com/sudharshan_tech/)
 
-### Core Sections
-- **Header & Navbar:** Fixed/sticky glassmorphic navigation featuring the official uploaded SUDHARSHAN_TECH logo asset, animated underline tracking, active section detection, smooth scrolling, and an interactive "Start a Project" CTA with **Arrow Fly-Through Micro-Interactions**.
-- **01 — Hero:** "WE BUILD WHAT'S NEXT." — Confident value proposition, location badge, system terminal preview with live latency metrics.
-- **02 — Selected Work:** Verified client deliveries (TECHNICO / Sterlitech) and internal prototypes (TaskGuard, AI Invigilation Engine, Virtual Air Painting, CineStream, NIDHI SETU) with comprehensive case study modal breakdowns.
-- **03 — Services:** Six pillars (Web Development, Custom Software, AI & Automation, UI/UX Design, Cloud & DevOps, Cybersecurity) explaining problems solved, concrete deliverables, and onboarding steps.
-- **04 — How We Work:** Disciplined 6-step engineering lifecycle: Discover → Plan → Design → Build → Test → Deploy.
-- **05 — About Us:** "BUILT FROM COIMBATORE. THINKING BEYOND IT." — Regional engineering roots, practical utility focus, and responsible development philosophy.
-- **06 — Meet Our Team:**
-  - **Sudharshan.P.S (Founder & CEO):** Genuine uploaded portrait, bio, quote (*“Turning ideas into impactful digital solutions.”*), direct verified email (`sudharshanthemagnet@gmail.com`), phone (`+91 9791495418`), and official Instagram (`@sudharshan_tech`).
-  - **Harini R (Business Development & Partnerships Associate):** Genuine photograph, role bio, quote (*“Connecting opportunities. Creating impact.”*), and core focus areas.
-- **07 — Contact CTA & Project Enquiry:** Fully-featured inquiry form with service selectors, budget ranges, validation, spam honeypot protection, and direct verified Coimbatore communication channels.
-- **Footer:** Crisp brandmark display, quick links, verified Instagram profile, direct email/phone, and copyright notices.
+📍 Coimbatore, Tamil Nadu, India
+
+<img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=600&size=18&duration=3000&pause=900&color=2563EB&center=true&vCenter=true&width=650&lines=Engineering+Modern+Web+Experiences;Building+AI-Powered+Solutions;Exploring+Cloud+%26+DevOps;Designing+with+Security+in+Mind" alt="Animated technology tagline"/>
+
+</div>
 
 ---
 
-## 🎯 Button Micro-Interactions System
+## ◈ About Us
 
-Engineered according to strict motion specifications:
-- **Animation A — Arrow Fly-Through with Contextual Icon:**
-  - Used on primary CTAs (`Start a Project`, `Contact Us`, `Submit`).
-  - Trailing arrow window contracts from `20px` to `0px` while leading contextual icon expands from `0px` to `20px` over `300ms` using `cubic-bezier(0.25, 1, 0.5, 1)`.
-  - **Zero Width Shift:** Total width exchange is mathematically equal, ensuring the label never shifts or reflows.
-- **Animation B — Icon Nudge:**
-  - Used on exploratory navigation (`Explore Our Work`, `Case Details`, `Live Site`).
-  - Translates icon by `4px` with `150ms` spring easing without altering button bounds.
+**SUDHARSHAN_TECH** is an independent technology initiative focused on building useful, modern, and accessible digital solutions.
 
----
+We combine engineering, creativity, and practical problem-solving to help turn ideas into digital products.
 
-## 🛠️ Technology Stack
+- 🌐 Web and software development
+- 🤖 AI-powered applications and automation
+- ☁️ Cloud infrastructure and DevOps
+- 🛡️ Cybersecurity-focused engineering
+- 🎨 UI/UX design and digital experiences
 
-- **Framework:** React 18 + Vite 6 + TypeScript
-- **Styling:** Tailwind CSS (Custom design system with tokens for Electric Blue & Deep Navy)
-- **Animation:** Framer Motion & CSS Transforms
-- **Icons:** Lucide React
-- **Typography:** Inter (Primary) & JetBrains Mono (Technical labels & code)
-- **Backend API:** Lightweight Node.js HTTP server with input sanitization, rate limiting, and honeypot spam protection.
+Our approach: **Understand the problem. Engineer the solution. Deliver with purpose.**
 
 ---
 
-## 💻 Local Development & Server
+## ◈ Technology Universe
 
-```bash
-# 1. Install dependencies
-npm install
+<div align="center">
 
-# 2. Run local frontend development server
-npm run dev
+![React](https://img.shields.io/badge/React-0F172A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![TypeScript](https://img.shields.io/badge/TypeScript-2563EB?style=for-the-badge&logo=typescript&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F8FAFC?style=for-the-badge&logo=javascript&logoColor=0F172A)
+![Python](https://img.shields.io/badge/Python-2563EB?style=for-the-badge&logo=python&logoColor=white)
+![Java](https://img.shields.io/badge/Java-0F172A?style=for-the-badge&logo=openjdk&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-F8FAFC?style=for-the-badge&logo=springboot&logoColor=2563EB)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-2563EB?style=for-the-badge&logo=tailwindcss&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-0F172A?style=for-the-badge&logo=nodedotjs&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-F8FAFC?style=for-the-badge&logo=docker&logoColor=2563EB)
+![AWS](https://img.shields.io/badge/AWS-2563EB?style=for-the-badge&logo=amazonaws&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-0F172A?style=for-the-badge&logo=mysql&logoColor=white)
+![Git](https://img.shields.io/badge/Git-F8FAFC?style=for-the-badge&logo=git&logoColor=2563EB)
 
-# 3. Build for production
-npm run build
+</div>
 
-# 4. Preview production build
-npm run preview
+---
 
-# 5. Run backend API server (Optional)
-npm run server
+## ◈ Engineering Focus
+
+<div align="center">
+
+| Domain | Focus |
+|:---|:---|
+| 🌐 Web Engineering | Responsive websites and modern interfaces |
+| ⚙️ Software Development | Applications, APIs, and workflow systems |
+| 🤖 AI & Automation | Intelligent prototypes and automated workflows |
+| ☁️ Cloud & DevOps | Deployment, containers, and infrastructure |
+| 🛡️ Cybersecurity | Secure development and application protection |
+| 🎨 UI/UX | Usable, accessible digital experiences |
+
+</div>
+
+---
+
+## ◈ Selected Projects
+
+### 01 — TECHNICO
+**Product & Business Web Experience**
+
+A web-based project focused on presenting products and business information through a modern digital interface.
+
+`Web Development` `UI/UX`
+
+### 02 — TaskGuard
+**Enterprise Project Task Management**
+
+A project focused on organizing tasks, tracking progress, and structuring project workflows.
+
+`Software Engineering` `Task Management`
+
+### 03 — AI Invigilation Engine
+**AI-Powered Examination Prototype**
+
+An AI-focused prototype exploring technology-assisted examination monitoring.
+
+`AI` `Computer Vision`
+
+### 04 — Virtual Air Painting
+**Gesture-Based Creative Interaction**
+
+An interactive computer-vision project exploring virtual drawing through hand gestures.
+
+`Python` `Computer Vision`
+
+### 05 — CineStream
+**Digital Entertainment Experience**
+
+A streaming-style project exploring content presentation and modern interface design.
+
+`Frontend Development` `UI/UX`
+
+### 06 — NIDHI SETU
+**Civic Technology Prototype**
+
+A concept focused on helping users discover relevant government assistance schemes and development opportunities.
+
+`Civic Tech` `Information Discovery`
+
+> Project descriptions identify the intended focus of each project. Refer to the individual repositories for implementation details and current status.
+
+---
+
+## ◈ Visualizing Our Engineering Focus
+
+<div align="center">
+
+<img src="https://quickchart.io/chart?width=620&height=320&backgroundColor=%23F8FAFC&c={type:'doughnut',data:{labels:['Web%20Engineering','Software','AI%20%26%20Automation','Cloud%20%26%20DevOps','Cybersecurity','UI%2FUX'],datasets:[{data:[1,1,1,1,1,1],backgroundColor:['%232563EB','%230F172A','%233B82F6','%2360A5FA','%231D4ED8','%2393C5FD']}]},options:{plugins:{legend:{position:'bottom',labels:{color:'%230F172A'}},title:{display:true,text:'Technology%20Focus%20Areas',color:'%230F172A'}}}}" width="100%" alt="Illustrative doughnut chart of technology focus areas"/>
+
+<sub>Illustrative visualization of focus areas — not measured skill levels or project percentages.</sub>
+
+</div>
+
+---
+
+## ◈ GitHub Analytics
+
+<div align="center">
+
+<a href="https://github.com/sudharshanps">
+<img height="180" src="https://github-readme-stats.vercel.app/api?username=sudharshanps&show_icons=true&theme=transparent&hide_border=true&title_color=2563EB&icon_color=2563EB&text_color=0F172A&rank_icon=github" alt="GitHub profile statistics"/>
+</a>
+
+<a href="https://github.com/sudharshanps">
+<img height="180" src="https://github-readme-stats.vercel.app/api/top-langs/?username=sudharshanps&layout=compact&theme=transparent&hide_border=true&title_color=2563EB&text_color=0F172A" alt="Most-used programming languages"/>
+</a>
+
+<img src="https://streak-stats.demolab.com?user=sudharshanps&theme=transparent&hide_border=true&ring=2563EB&fire=2563EB&currStreakLabel=2563EB&sideLabels=0F172A&dates=64748B" alt="GitHub contribution streak statistics" width="100%"/>
+
+<img src="https://github-readme-activity-graph.vercel.app/graph?username=sudharshanps&bg_color=F8FAFC&color=0F172A&line=2563EB&point=1D4ED8&area=true&hide_border=true" width="100%" alt="GitHub activity graph"/>
+
+</div>
+
+---
+
+## ◈ How We Work
+
+<div align="center">
+
+```mermaid
+flowchart LR
+    A["01 Discover"] --> B["02 Plan"]
+    B --> C["03 Design"]
+    C --> D["04 Build"]
+    D --> E["05 Test"]
+    E --> F["06 Deploy"]
+
+    style A fill:#2563EB,color:#FFFFFF,stroke:#2563EB
+    style B fill:#1D4ED8,color:#FFFFFF,stroke:#1D4ED8
+    style C fill:#0F172A,color:#FFFFFF,stroke:#0F172A
+    style D fill:#2563EB,color:#FFFFFF,stroke:#2563EB
+    style E fill:#1D4ED8,color:#FFFFFF,stroke:#1D4ED8
+    style F fill:#0F172A,color:#FFFFFF,stroke:#0F172A
 ```
 
----
-
-## 📁 Project Structure
-
-```
-├── public/
-│   └── assets/
-│       ├── st-logo.png             # Official SUDHARSHAN_TECH logo
-│       ├── founder-sudharshan.png  # Sudharshan.P.S profile photograph
-│       └── team-harini.jpg         # Harini R profile photograph
-├── server/
-│   └── index.js                    # Node.js API server (sanitization, rate limit, honeypot)
-├── src/
-│   ├── components/
-│   │   ├── ui/
-│   │   │   └── Button.tsx          # Micro-interaction button system
-│   │   ├── Navbar.tsx              # Animated header with official logo & drawer
-│   │   ├── Hero.tsx                # Value proposition & digital system preview
-│   │   ├── SelectedWork.tsx        # Categorized work grid with filter pills
-│   │   ├── ProjectModal.tsx        # Deep-dive case study modal
-│   │   ├── Services.tsx            # 6 core engineering service cards
-│   │   ├── HowWeWork.tsx           # 6-step execution lifecycle
-│   │   ├── About.tsx               # Company history, mission & philosophy
-│   │   ├── Team.tsx                # Meet Our Team (Founder first, Harini second)
-│   │   ├── ContactSection.tsx      # Comprehensive enquiry form & channels
-│   │   ├── ContactModal.tsx        # Fast enquiry pop-up
-│   │   └── Footer.tsx              # Enterprise footer & brandmark
-│   ├── data/
-│   │   └── portfolioData.ts        # Verified project & company metadata
-│   ├── types/
-│   │   └── index.ts                # Strict TypeScript contracts
-│   ├── App.tsx                     # Application layout & state orchestration
-│   ├── main.tsx                    # DOM root entry
-│   └── index.css                   # Custom scrollbars, grids & Tailwind layers
-├── .env.example                    # Environment template
-├── tailwind.config.js              # Brand color tokens & extensions
-├── vite.config.ts                  # Vite bundler configuration
-└── tsconfig.json                   # Strict TypeScript configuration
-```
+</div>
 
 ---
 
-## 🔒 Verified Contact & Social Links
-- **Official Email:** `mailto:sudharshanthemagnet@gmail.com?subject=Project%20Enquiry%20%E2%80%94%20SUDHARSHAN_TECH`
-- **Phone / WhatsApp:** `tel:+919791495418`
-- **Instagram:** `https://www.instagram.com/sudharshan_tech/`
+## ◈ Leadership
+
+<div align="center">
+
+### Sudharshan P.S.
+**Founder & CEO — SUDHARSHAN_TECH**
+
+*"Turning ideas into impactful digital solutions."*
+
+[![Email](https://img.shields.io/badge/Email-Contact-2563EB?style=flat-square&logo=gmail&logoColor=white)](mailto:sudharshanthemagnet@gmail.com)
+[![Instagram](https://img.shields.io/badge/Instagram-Connect-0F172A?style=flat-square&logo=instagram&logoColor=white)](https://www.instagram.com/sudharshan_tech/)
+
+### Harini R
+**Business Development & Partnerships Associate**
+
+*"Connecting opportunities. Creating impact."*
+
+</div>
+
+---
+
+## ◈ Let's Build Something Meaningful
+
+Have a project idea, a business challenge, or an opportunity to collaborate? Let's connect.
+
+<div align="center">
+
+[![Start a Conversation](https://img.shields.io/badge/Start_a_Conversation-2563EB?style=for-the-badge&logo=maildotru&logoColor=white)](mailto:sudharshanthemagnet@gmail.com?subject=Project%20Enquiry%20%E2%80%94%20SUDHARSHAN_TECH)
+
+[![Visit Instagram](https://img.shields.io/badge/Follow_SUDHARSHAN_TECH-0F172A?style=for-the-badge&logo=instagram&logoColor=white)](https://www.instagram.com/sudharshan_tech/)
+
+**SUDHARSHAN_TECH**  
+*Code. Create. Elevate.*
+
+Coimbatore, Tamil Nadu, India
+
+</div>
+
+---
+
+<div align="center">
+
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:2563EB,50:1D4ED8,100:0F172A&height=110&section=footer" width="100%" alt="Blue animated footer banner"/>
+
+<sub>Designed with purpose. Engineered with care.</sub>
+
+</div>
