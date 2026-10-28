@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: sudharshan-tech
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: FRONTEND_URL
+        value: https://sudharshantech.com
+      - key: ADDITIONAL_ALLOWED_ORIGINS
+        value: https://www.sudharshantech.com
+      - key: ADMIN_SECRET
+        generateValue: true
+      - key: MONITORING_INTERVAL_MS
+        value: "60000"
+      # If using a paid persistent disk on Render, uncomment the disk section below and set:
+      # - key: DATA_DIR
+      #   value: /data
+    # disk:
+    #   name: sudharshan-tech-data
+    #   mountPath: /data
+    #   sizeGB: 1

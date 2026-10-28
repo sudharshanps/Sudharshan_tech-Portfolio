@@ -1,0 +1,10 @@
+node_modules
+dist
+.git
+.gemini
+*.log
+.env
+.env.local
+server/inquiries.json
+server/database.sqlite*
+server/monitoring-history.json
