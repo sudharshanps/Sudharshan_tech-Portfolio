@@ -22,7 +22,7 @@ const __dirname = path.dirname(__filename);
 const PORT = parseInt(process.env.PORT || '5000', 10);
 const HOST = process.env.HOST || '0.0.0.0';
 const MONITORING_INTERVAL_MS = parseInt(process.env.MONITORING_INTERVAL_MS || '60000', 10);
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
+const FRONTEND_URL = process.env.FRONTEND_URL || 'https://sudharshantech.com';
 
 // Production-hardened Admin Secret configuration
 // In production, reject static default placeholder and generate an ephemeral secret if unset
@@ -46,6 +46,8 @@ const ALLOWED_ORIGINS = new Set([
   'http://127.0.0.1:3000',
   'http://127.0.0.1:5173',
   'http://127.0.0.1:5000',
+  'https://sudharshantech.com',
+  'https://www.sudharshantech.com',
 ]);
 
 if (FRONTEND_URL) {
@@ -63,12 +65,21 @@ if (process.env.ADDITIONAL_ALLOWED_ORIGINS) {
   });
 }
 
-// Persistence file paths
-const HISTORY_FILE = path.join(__dirname, 'monitoring-history.json');
-const INQUIRIES_FILE = path.join(__dirname, 'inquiries.json');
-const CHANGELOG_FILE = path.join(__dirname, 'changelog.json');
-const PULSE_FILE = path.join(__dirname, 'project-pulse.json');
-const DATABASE_FILE = path.join(__dirname, 'database.sqlite');
+// Persistence file directory (supports custom mount paths on cloud persistent volumes)
+const DATA_DIR = process.env.DATA_DIR || __dirname;
+if (!fs.existsSync(DATA_DIR)) {
+  try {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+  } catch (e) {
+    console.warn('[Storage] Could not initialize DATA_DIR:', e.message);
+  }
+}
+
+const HISTORY_FILE = path.join(DATA_DIR, 'monitoring-history.json');
+const INQUIRIES_FILE = path.join(DATA_DIR, 'inquiries.json');
+const CHANGELOG_FILE = path.join(DATA_DIR, 'changelog.json');
+const PULSE_FILE = path.join(DATA_DIR, 'project-pulse.json');
+const DATABASE_FILE = path.join(DATA_DIR, 'database.sqlite');
 
 // Default initial changelog entries
 const DEFAULT_CHANGELOG = [
@@ -589,7 +600,7 @@ function pingService(target) {
         method: 'HEAD',
         timeout: 5000,
         headers: {
-          'User-Agent': 'SUDHARSHAN_TECH-HealthMonitor/2.5 (+https://sudharshan-tech.com)',
+          'User-Agent': 'SUDHARSHAN_TECH-HealthMonitor/2.5 (+https://sudharshantech.com)',
         },
       },
       (res) => {
@@ -831,7 +842,7 @@ function runWebsiteAudit(targetUrl, maxRedirects = 2) {
             headers: {
               'Host': parsed.host,
               'User-Agent':
-                'Mozilla/5.0 (compatible; SUDHARSHAN_TECH-SiteAudit/2.5; +https://sudharshan-tech.com)',
+                'Mozilla/5.0 (compatible; SUDHARSHAN_TECH-SiteAudit/2.5; +https://sudharshantech.com)',
               Accept: 'text/html,application/xhtml+xml',
             },
             timeout: 6000,
@@ -1751,7 +1762,69 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // Not found
+  // 12. Static Assets & SPA Client-Side Routing Fallback (Active when dist/ is compiled)
+  if (!pathname.startsWith('/api/') && req.method === 'GET') {
+    const DIST_DIR = path.resolve(__dirname, '..', 'dist');
+    if (fs.existsSync(DIST_DIR)) {
+      const safePath = path.normalize(pathname).replace(/^(\.\.[\/\\])+/, '');
+      const filePath = path.join(
+        DIST_DIR,
+        safePath === path.sep || safePath === '/' ? 'index.html' : safePath
+      );
+
+      // Verify path stays strictly within DIST_DIR (Directory traversal prevention)
+      if (filePath.startsWith(DIST_DIR)) {
+        let stat = null;
+        try {
+          if (fs.existsSync(filePath)) {
+            stat = fs.statSync(filePath);
+          }
+        } catch {}
+
+        if (stat && stat.isFile()) {
+          const ext = path.extname(filePath).toLowerCase();
+          const mimeTypes = {
+            '.html': 'text/html; charset=utf-8',
+            '.js': 'application/javascript; charset=utf-8',
+            '.css': 'text/css; charset=utf-8',
+            '.json': 'application/json; charset=utf-8',
+            '.png': 'image/png',
+            '.jpg': 'image/jpeg',
+            '.jpeg': 'image/jpeg',
+            '.svg': 'image/svg+xml',
+            '.ico': 'image/x-icon',
+            '.webp': 'image/webp',
+            '.woff2': 'font/woff2',
+            '.xml': 'application/xml; charset=utf-8',
+            '.txt': 'text/plain; charset=utf-8',
+          };
+          const contentType = mimeTypes[ext] || 'application/octet-stream';
+          const isAsset = safePath.startsWith(path.sep + 'assets') || safePath.startsWith('/assets');
+          res.writeHead(200, {
+            'Content-Type': contentType,
+            'Cache-Control': isAsset
+              ? 'public, max-age=31536000, immutable'
+              : 'public, max-age=3600',
+          });
+          fs.createReadStream(filePath).pipe(res);
+          return;
+        }
+
+        // SPA History API Fallback: Serve index.html for all client routes (/status, /changelog, etc.)
+        const indexHtmlPath = path.join(DIST_DIR, 'index.html');
+        if (fs.existsSync(indexHtmlPath)) {
+          res.writeHead(200, {
+            'Content-Type': 'text/html; charset=utf-8',
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+          });
+          fs.createReadStream(indexHtmlPath).pipe(res);
+          return;
+        }
+      }
+    }
+  }
+
+  // Not found (API or unmatched route)
   res.writeHead(404, {
     'Content-Type': 'application/json',
     'Cache-Control': 'no-store, private',
