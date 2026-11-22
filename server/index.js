@@ -1686,7 +1686,7 @@ const server = http.createServer(async (req, res) => {
           question.includes('hire')
         ) {
           answer =
-            'You can contact Founder Sudharshan.P.S directly at sudharshanthemagnet@gmail.com, call +91 9791495418, or use the "Start a Project" enquiry form on our website.';
+            'You can contact Founder Sudharshan.P.S directly at sudharshantech123@gmail.com, call +91 9791495418, or use the "Start a Project" enquiry form on our website.';
         } else if (
           question.includes('society') ||
           question.includes('community') ||
