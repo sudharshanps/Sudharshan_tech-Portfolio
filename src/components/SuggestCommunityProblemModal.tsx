@@ -106,7 +106,7 @@ ${additionalDetails.trim() || 'None specified.'}`;
       }
     } catch {
       setFormError(
-        'Unable to connect to the server. Please verify your connection or email directly at sudharshanthemagnet@gmail.com.'
+        'Unable to connect to the server. Please verify your connection or email directly at sudharshantech123@gmail.com.'
       );
     } finally {
       setIsSubmitting(false);
