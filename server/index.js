@@ -1760,7 +1760,7 @@ const server = http.createServer(async (req, res) => {
   }
 
   // 7. Update enquiry status (Admin Protected)
-  const updateInquiryStatusMatch = pathname.match(/^\\/api\\/inquiries\\/([^/]+)\\/status$/);
+  const updateInquiryStatusMatch = pathname.match(/^\/api\/inquiries\/([^/]+)\/status$/);
   if (req.method === 'PATCH' && updateInquiryStatusMatch) {
     if (!isAuthorized(req)) {
       res.writeHead(401, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store, private' });
