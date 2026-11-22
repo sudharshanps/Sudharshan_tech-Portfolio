@@ -18,7 +18,7 @@ export const COMPANY_INFO = {
   subHeadline: 'Software. AI. Digital Experiences.',
   mission: 'We turn business needs and ideas into thoughtfully designed digital solutions.',
   location: 'Coimbatore, Tamil Nadu, India',
-  email: 'sudharshanthemagnet@gmail.com',
+  email: 'sudharshantech123@gmail.com',
   phone: '+91 9791495418',
   phoneDisplay: '+91 9791495418',
   instagramUrl: 'https://www.instagram.com/sudharshan_tech/',
@@ -415,7 +415,7 @@ export const TEAM_MEMBERS: TeamMember[] = [
     image: '/assets/founder-sudharshan.png',
     altText: 'Sudharshan.P.S — Founder & CEO of SUDHARSHAN_TECH',
     isSpotlight: true,
-    email: 'sudharshanthemagnet@gmail.com',
+    email: 'sudharshantech123@gmail.com',
     phone: '+91 9791495418',
     instagramUrl: 'https://www.instagram.com/sudharshan_tech/',
     highlights: [
