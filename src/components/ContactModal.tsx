@@ -143,9 +143,9 @@ export const ContactModal: React.FC<ContactModalProps> = ({
                 <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto border border-emerald-200">
                   <CheckCircle2 className="w-7 h-7" />
                 </div>
-                <h4 className="text-xl font-bold text-brand-navy">Enquiry Dispatched Successfully</h4>
+                <h4 className="text-xl font-bold text-brand-navy">Request Received Successfully</h4>
                 <p className="text-xs sm:text-sm text-slate-600 max-w-xs mx-auto leading-relaxed">
-                  Thank you, <strong>{formData.fullName}</strong>. We have received your project details regarding <strong>{formData.serviceType}</strong> and will reach out to <strong>{formData.email}</strong> within 24 hours.
+                  Thank you, <strong>{formData.fullName}</strong>. We have received your request for <strong>{formData.serviceType}</strong>. We will contact you at <strong>{formData.email}</strong> within 24 hours.
                 </p>
                 {referenceId && (
                   <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono text-slate-600 max-w-xs mx-auto">

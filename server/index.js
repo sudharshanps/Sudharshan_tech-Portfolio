@@ -81,6 +81,20 @@ const CHANGELOG_FILE = path.join(DATA_DIR, 'changelog.json');
 const PULSE_FILE = path.join(DATA_DIR, 'project-pulse.json');
 const DATABASE_FILE = path.join(DATA_DIR, 'database.sqlite');
 
+// Supabase is the production system of record. Keep the service-role key server-side only.
+const SUPABASE_URL = (process.env.SUPABASE_URL || '').replace(/\\/+$/, '');
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+const SUPABASE_ENABLED = Boolean(SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY);
+const TO_EMAIL = process.env.TO_EMAIL || 'sudharshantech123@gmail.com';
+const RESEND_API_KEY = process.env.RESEND_API_KEY || '';
+const RESEND_FROM_EMAIL = process.env.RESEND_FROM_EMAIL || '';
+const WHATSAPP_ACCESS_TOKEN = process.env.WHATSAPP_ACCESS_TOKEN || '';
+const WHATSAPP_PHONE_NUMBER_ID = process.env.WHATSAPP_PHONE_NUMBER_ID || '';
+const WHATSAPP_RECIPIENT = (process.env.WHATSAPP_RECIPIENT || '919791495418').replace(/\\D/g, '');
+const WHATSAPP_TEMPLATE_NAME = process.env.WHATSAPP_TEMPLATE_NAME || '';
+const WHATSAPP_TEMPLATE_LANGUAGE = process.env.WHATSAPP_TEMPLATE_LANGUAGE || 'en_US';
+const WHATSAPP_API_VERSION = process.env.WHATSAPP_API_VERSION || '';
+
 // Default initial changelog entries
 const DEFAULT_CHANGELOG = [
   {
@@ -298,98 +312,269 @@ try {
 // Concurrency-safe promise queue for inquiry mutations
 let inquiryQueue = Promise.resolve();
 
+// Server-side REST helper. Supabase credentials are never sent to the browser.
+async function supabaseRest(resource, options = {}) {
+  if (!SUPABASE_ENABLED) throw new Error('Supabase is not configured.');
+  const response = await fetch(`${SUPABASE_URL}/rest/v1/${resource}`, {
+    ...options,
+    headers: {
+      apikey: SUPABASE_SERVICE_ROLE_KEY,
+      Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+      'Content-Type': 'application/json',
+      ...(options.headers || {}),
+    },
+  });
+  const raw = await response.text();
+  let data = null;
+  if (raw) {
+    try { data = JSON.parse(raw); } catch { data = raw; }
+  }
+  if (!response.ok) {
+    const detail = data && typeof data === 'object' ? (data.message || data.hint || data.details) : data;
+    throw new Error(`Supabase request failed (${response.status}): ${detail || 'Unknown database error'}`);
+  }
+  return { data, headers: response.headers };
+}
+
+function escapeHtml(value = '') {
+  return String(value).replace(/[&<>"']/g, (char) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+  })[char]);
+}
+
+async function sendEmailNotification(record) {
+  if (!RESEND_API_KEY || !RESEND_FROM_EMAIL) return { status: 'not_configured' };
+  const subject = `New website enquiry — ${record.referenceId}`;
+  const rows = [
+    ['Reference', record.referenceId],
+    ['Name', record.fullName],
+    ['Email', record.email],
+    ['Phone / WhatsApp', record.phone || 'Not provided'],
+    ['Company', record.company || 'Not provided'],
+    ['Service', record.serviceType || 'Not specified'],
+    ['Budget', record.budgetRange || 'Not specified'],
+    ['Timeline', record.timeline || 'Not specified'],
+    ['Project details', record.projectDetails || record.estimatorBrief || 'Not provided'],
+  ];
+  const html = `<div style="font-family:Arial,sans-serif;color:#172033;max-width:640px;margin:auto">
+    <div style="background:#0b1830;color:#fff;padding:22px 26px;border-radius:12px 12px 0 0">
+      <h2 style="margin:0;font-size:20px">New SUDHARSHAN_TECH enquiry</h2>
+      <p style="margin:7px 0 0;color:#bfdbfe;font-size:13px">A new request was submitted through your website.</p>
+    </div>
+    <div style="padding:22px 26px;border:1px solid #e2e8f0;border-top:0;border-radius:0 0 12px 12px">
+      <table style="width:100%;border-collapse:collapse">${rows.map(([label,value]) => `<tr><th align="left" style="padding:9px 8px;border-bottom:1px solid #e8edf4;color:#64748b;font-size:12px;width:150px">${escapeHtml(label)}</th><td style="padding:9px 8px;border-bottom:1px solid #e8edf4;font-size:13px;white-space:pre-wrap">${escapeHtml(value)}</td></tr>`).join('')}</table>
+      <p style="font-size:12px;color:#64748b;margin:18px 0 0">Review this request in the SUDHARSHAN_TECH admin enquiries endpoint.</p>
+    </div></div>`;
+  const response = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      from: RESEND_FROM_EMAIL,
+      to: [TO_EMAIL],
+      reply_to: record.email,
+      subject,
+      html,
+      text: rows.map(([label, value]) => `${label}: ${value}`).join('\\n'),
+    }),
+  });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(payload.message || `Resend rejected the email (${response.status}).`);
+  return { status: 'sent', id: payload.id || null };
+}
+
+async function sendWhatsAppNotification(record) {
+  if (!WHATSAPP_ACCESS_TOKEN || !WHATSAPP_PHONE_NUMBER_ID || !WHATSAPP_RECIPIENT ||
+      !WHATSAPP_TEMPLATE_NAME || !/^v\\d+\\.\\d+$/.test(WHATSAPP_API_VERSION)) {
+    return { status: 'not_configured' };
+  }
+  const parameters = [
+    record.referenceId,
+    record.fullName,
+    record.serviceType || 'Not specified',
+    record.email,
+    record.phone || 'Not provided',
+    record.budgetRange || 'Not specified',
+    (record.projectDetails || record.estimatorBrief || 'Not provided').slice(0, 350),
+  ];
+  const response = await fetch(
+    `https://graph.facebook.com/${WHATSAPP_API_VERSION}/${WHATSAPP_PHONE_NUMBER_ID}/messages`,
+    {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${WHATSAPP_ACCESS_TOKEN}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        messaging_product: 'whatsapp',
+        recipient_type: 'individual',
+        to: WHATSAPP_RECIPIENT,
+        type: 'template',
+        template: {
+          name: WHATSAPP_TEMPLATE_NAME,
+          language: { code: WHATSAPP_TEMPLATE_LANGUAGE },
+          components: [{
+            type: 'body',
+            parameters: parameters.map((value) => ({ type: 'text', text: String(value).slice(0, 1024) })),
+          }],
+        },
+      }),
+    }
+  );
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const detail = payload.error?.message || `WhatsApp Cloud API rejected the message (${response.status}).`;
+    throw new Error(detail);
+  }
+  return { status: 'sent', messageId: payload.messages?.[0]?.id || null };
+}
+
+// Concurrency-safe persistence queue. Supabase is primary when configured;
+// JSON/SQLite remain local-development fallbacks only.
+let inquiryQueue = Promise.resolve();
+
 function appendInquiry(record) {
-  return new Promise((resolve, reject) => {
-    inquiryQueue = inquiryQueue.then(() => {
+  const operation = async () => {
+    if (SUPABASE_ENABLED) {
+      await supabaseRest('inquiries', {
+        method: 'POST',
+        headers: { Prefer: 'return=minimal' },
+        body: JSON.stringify({
+          reference_id: record.referenceId,
+          created_at: record.timestamp,
+          full_name: record.fullName,
+          email: record.email,
+          phone: record.phone || null,
+          company: record.company || null,
+          service_type: record.serviceType || null,
+          budget_range: record.budgetRange || null,
+          timeline: record.timeline || null,
+          project_details: record.projectDetails || null,
+          estimator_brief: record.estimatorBrief || null,
+          status: 'new',
+          email_notification_status: 'pending',
+          whatsapp_notification_status: 'pending',
+          raw_json: record,
+        }),
+      });
+      return record;
+    }
+
+    const list = safeReadJsonSync(INQUIRIES_FILE, []);
+    list.push(record);
+    safeWriteJsonSync(INQUIRIES_FILE, list);
+    if (sqliteDb) {
       try {
-        const list = safeReadJsonSync(INQUIRIES_FILE, []);
-        list.push(record);
-        safeWriteJsonSync(INQUIRIES_FILE, list);
-
-        if (sqliteDb) {
-          try {
-            const stmt = sqliteDb.prepare(`
-              INSERT OR REPLACE INTO inquiries 
-              (reference_id, timestamp, full_name, email, phone, company, service_type, budget_range, timeline, project_details, raw_json)
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            `);
-            stmt.run(
-              record.referenceId,
-              record.timestamp,
-              record.fullName,
-              record.email,
-              record.phone || '',
-              record.company || '',
-              record.serviceType || '',
-              record.budgetRange || '',
-              record.timeline || '',
-              record.projectDetails || '',
-              JSON.stringify(record)
-            );
-          } catch (sqlErr) {
-            console.warn('[SQLite] Mirror write failed:', sqlErr.message);
-          }
-        }
-
-        resolve(record);
-      } catch (err) {
-        reject(err);
+        const stmt = sqliteDb.prepare(`
+          INSERT OR REPLACE INTO inquiries
+          (reference_id, timestamp, full_name, email, phone, company, service_type, budget_range, timeline, project_details, raw_json)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `);
+        stmt.run(record.referenceId, record.timestamp, record.fullName, record.email,
+          record.phone || '', record.company || '', record.serviceType || '',
+          record.budgetRange || '', record.timeline || '', record.projectDetails || '',
+          JSON.stringify(record));
+      } catch (sqlError) {
+        console.warn('[SQLite] Mirror insert failed; using durable JSON fallback:', sqlError.message);
+        try { sqliteDb.close(); } catch {}
+        sqliteDb = null;
       }
-    });
-  });
+    }
+    return record;
+  };
+  inquiryQueue = inquiryQueue.then(operation, operation);
+  return inquiryQueue;
 }
 
-function deleteInquiry(targetRef) {
-  return new Promise((resolve, reject) => {
-    inquiryQueue = inquiryQueue.then(() => {
-      try {
-        let list = safeReadJsonSync(INQUIRIES_FILE, []);
-        const initialLen = list.length;
-        list = list.filter((item) => item.referenceId !== targetRef);
-        const removed = list.length < initialLen;
-        if (removed) {
-          safeWriteJsonSync(INQUIRIES_FILE, list);
-        }
-
-        if (sqliteDb) {
-          try {
-            const stmt = sqliteDb.prepare('DELETE FROM inquiries WHERE reference_id = ?');
-            stmt.run(targetRef);
-          } catch (sqlErr) {
-            console.warn('[SQLite] Delete failed:', sqlErr.message);
-          }
-        }
-
-        resolve({ removed, remainingCount: list.length });
-      } catch (err) {
-        reject(err);
-      }
+async function updateInquiryNotificationStatuses(referenceId, emailStatus, whatsappStatus) {
+  if (SUPABASE_ENABLED) {
+    await supabaseRest(`inquiries?reference_id=eq.${encodeURIComponent(referenceId)}`, {
+      method: 'PATCH',
+      headers: { Prefer: 'return=minimal' },
+      body: JSON.stringify({
+        email_notification_status: emailStatus,
+        whatsapp_notification_status: whatsappStatus,
+        notification_updated_at: new Date().toISOString(),
+      }),
     });
-  });
+    return;
+  }
+
+  const operation = async () => {
+    const list = safeReadJsonSync(INQUIRIES_FILE, []);
+    const record = list.find((item) => item.referenceId === referenceId);
+    if (record) {
+      record.notificationStatus = { email: emailStatus, whatsapp: whatsappStatus };
+      safeWriteJsonSync(INQUIRIES_FILE, list);
+    }
+    if (sqliteDb && record) {
+      sqliteDb.prepare('UPDATE inquiries SET raw_json = ? WHERE reference_id = ?')
+        .run(JSON.stringify(record), referenceId);
+    }
+  };
+  inquiryQueue = inquiryQueue.then(operation, operation);
+  await inquiryQueue;
 }
 
-// Paginated inquiry reader with SQLite prioritization and atomic JSON fallback
-function getInquiries({ page = 1, limit = 50 } = {}) {
+async function deleteInquiry(targetRef) {
+  if (SUPABASE_ENABLED) {
+    const deleted = await supabaseRest(
+      `inquiries?reference_id=eq.${encodeURIComponent(targetRef)}&select=reference_id`,
+      { method: 'DELETE', headers: { Prefer: 'return=representation' } }
+    );
+    const removed = Array.isArray(deleted.data) && deleted.data.length > 0;
+    const countResult = await supabaseRest('inquiries?select=reference_id&limit=1', {
+      headers: { Prefer: 'count=exact' },
+    });
+    const range = countResult.headers.get('content-range') || '';
+    const remainingCount = Number(range.split('/')[1]) || 0;
+    return { removed, remainingCount };
+  }
+
+  const operation = async () => {
+    let list = safeReadJsonSync(INQUIRIES_FILE, []);
+    const initialLen = list.length;
+    list = list.filter((item) => item.referenceId !== targetRef);
+    const removed = list.length < initialLen;
+    if (removed) safeWriteJsonSync(INQUIRIES_FILE, list);
+    if (sqliteDb) sqliteDb.prepare('DELETE FROM inquiries WHERE reference_id = ?').run(targetRef);
+    return { removed, remainingCount: list.length };
+  };
+  inquiryQueue = inquiryQueue.then(operation, operation);
+  return inquiryQueue;
+}
+
+async function getInquiries({ page = 1, limit = 50 } = {}) {
   const safePage = Math.max(1, parseInt(page, 10) || 1);
   const safeLimit = Math.min(100, Math.max(1, parseInt(limit, 10) || 50));
   const offset = (safePage - 1) * safeLimit;
 
+  if (SUPABASE_ENABLED) {
+    const result = await supabaseRest(
+      `inquiries?select=*&order=created_at.desc&limit=${safeLimit}&offset=${offset}`,
+      { headers: { Prefer: 'count=exact' } }
+    );
+    const range = result.headers.get('content-range') || '';
+    const total = Number(range.split('/')[1]) || (Array.isArray(result.data) ? result.data.length : 0);
+    const inquiries = (result.data || []).map((row) => ({
+      ...(row.raw_json && typeof row.raw_json === 'object' ? row.raw_json : {}),
+      referenceId: row.reference_id,
+      timestamp: row.created_at,
+      status: row.status,
+      notificationStatus: {
+        email: row.email_notification_status,
+        whatsapp: row.whatsapp_notification_status,
+      },
+    }));
+    return { inquiries, total, page: safePage, limit: safeLimit, totalPages: Math.ceil(total / safeLimit) || 1 };
+  }
+
   if (sqliteDb) {
     try {
-      const countStmt = sqliteDb.prepare('SELECT COUNT(*) as total FROM inquiries');
-      const totalRow = countStmt.get();
+      const totalRow = sqliteDb.prepare('SELECT COUNT(*) as total FROM inquiries').get();
       const total = totalRow ? totalRow.total : 0;
-
-      const stmt = sqliteDb.prepare(
+      const rows = sqliteDb.prepare(
         'SELECT raw_json FROM inquiries ORDER BY timestamp DESC LIMIT ? OFFSET ?'
-      );
-      const rows = stmt.all(safeLimit, offset);
-      const inquiries = rows.map((r) => JSON.parse(r.raw_json));
+      ).all(safeLimit, offset);
       return {
-        inquiries,
-        total,
-        page: safePage,
-        limit: safeLimit,
+        inquiries: rows.map((row) => JSON.parse(row.raw_json)),
+        total, page: safePage, limit: safeLimit,
         totalPages: Math.ceil(total / safeLimit) || 1,
       };
     } catch (sqlErr) {
@@ -397,18 +582,10 @@ function getInquiries({ page = 1, limit = 50 } = {}) {
     }
   }
 
-  // Fallback to atomic JSON file
   const all = safeReadJsonSync(INQUIRIES_FILE, []);
   const total = all.length;
-  const reversed = all.slice().reverse();
-  const inquiries = reversed.slice(offset, offset + safeLimit);
-  return {
-    inquiries,
-    total,
-    page: safePage,
-    limit: safeLimit,
-    totalPages: Math.ceil(total / safeLimit) || 1,
-  };
+  const inquiries = all.slice().reverse().slice(offset, offset + safeLimit);
+  return { inquiries, total, page: safePage, limit: safeLimit, totalPages: Math.ceil(total / safeLimit) || 1 };
 }
 
 // Constant-time string comparison preventing timing side-channel attacks
@@ -1241,6 +1418,12 @@ const server = http.createServer(async (req, res) => {
 
   // 4. Contact Enquiry & Project Brief Submission (Rate-Limited, Honeypot & Idempotency Protected)
   if (req.method === 'POST' && pathname === '/api/contact') {
+    // Never claim durable receipt in production while the database is unconfigured.
+    if (process.env.NODE_ENV === 'production' && !SUPABASE_ENABLED) {
+      res.writeHead(503, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store, private' });
+      res.end(JSON.stringify({ error: 'Enquiry storage is temporarily unavailable. Please contact us directly while the database is configured.' }));
+      return;
+    }
     // Rate limit: 6 submissions per 10 minutes per IP
     if (!checkRateLimit(clientIp, 'contact', 6, 10 * 60 * 1000)) {
       res.writeHead(429, {
@@ -1392,11 +1575,31 @@ const server = http.createServer(async (req, res) => {
           timeline,
           projectDetails,
           estimatorBrief,
+          status: 'new',
         };
 
         // Append to server-side inquiries log & SQLite ACID mirror
         await appendInquiry(record);
         recordDeduplicatedSubmission(clientIp, email, projectDetails || estimatorBrief, record);
+
+        // Persist first, then attempt both alerts. Notification failures never discard the enquiry.
+        const [emailAlert, whatsappAlert] = await Promise.all([
+          sendEmailNotification(record).catch((error) => {
+            console.error(`[Email Notification] ${referenceId}:`, error.message);
+            return { status: 'failed', error: error.message };
+          }),
+          sendWhatsAppNotification(record).catch((error) => {
+            console.error(`[WhatsApp Notification] ${referenceId}:`, error.message);
+            return { status: 'failed', error: error.message };
+          }),
+        ]);
+        record.notificationStatus = {
+          email: emailAlert.status,
+          whatsapp: whatsappAlert.status,
+        };
+        await updateInquiryNotificationStatuses(
+          referenceId, emailAlert.status, whatsappAlert.status
+        ).catch((error) => console.error('[Notification Status] Could not update status:', error.message));
 
         console.log(`[Enquiry Received] Ref: ${referenceId} from ${fullName} <${email}>`);
 
@@ -1409,7 +1612,11 @@ const server = http.createServer(async (req, res) => {
             success: true,
             referenceId,
             message:
-              'Your project brief has been received. Founder Sudharshan.P.S will review and reply within 24 hours.',
+              'Your project brief has been saved. Founder Sudharshan P.S will review and reply within 24 hours.',
+            notifications: {
+              email: emailAlert.status,
+              whatsapp: whatsappAlert.status,
+            },
           })
         );
       } catch (err) {
@@ -1486,7 +1693,7 @@ const server = http.createServer(async (req, res) => {
           question.includes('hire')
         ) {
           answer =
-            'You can contact Founder Sudharshan.P.S directly at sudharshanthemagnet@gmail.com, call +91 9791495418, or use the "Start a Project" enquiry form on our website.';
+            'You can contact Founder Sudharshan.P.S directly at sudharshantech123@gmail.com, call +91 9791495418, or use the "Start a Project" enquiry form on our website.';
         } else if (
           question.includes('society') ||
           question.includes('community') ||
@@ -1536,7 +1743,7 @@ const server = http.createServer(async (req, res) => {
     try {
       const page = parsedUrl.searchParams.get('page') || '1';
       const limit = parsedUrl.searchParams.get('limit') || '50';
-      const result = getInquiries({ page, limit });
+      const result = await getInquiries({ page, limit });
 
       res.writeHead(200, {
         'Content-Type': 'application/json',
@@ -1559,7 +1766,60 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // 7. Delete Inquiry (Admin Protected)
+  // 7. Update enquiry status (Admin Protected)
+  const updateInquiryStatusMatch = pathname.match(/^\/api\/inquiries\/([^/]+)\/status$/);
+  if (req.method === 'PATCH' && updateInquiryStatusMatch) {
+    if (!isAuthorized(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store, private' });
+      res.end(JSON.stringify({ error: 'Unauthorized: Valid x-admin-token or Bearer token required.' }));
+      return;
+    }
+    let body = '';
+    req.on('data', (chunk) => {
+      body += chunk;
+      if (body.length > 16 * 1024) req.destroy();
+    });
+    req.on('end', async () => {
+      try {
+        const data = JSON.parse(body || '{}');
+        const allowedStatuses = new Set(['new', 'reviewing', 'contacted', 'quoted', 'in_progress', 'completed', 'closed']);
+        if (!allowedStatuses.has(data.status)) {
+          res.writeHead(400, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store, private' });
+          res.end(JSON.stringify({ error: 'Invalid status. Allowed: new, reviewing, contacted, quoted, in_progress, completed, closed.' }));
+          return;
+        }
+        const referenceId = decodeURIComponent(updateInquiryStatusMatch[1]);
+        if (SUPABASE_ENABLED) {
+          const result = await supabaseRest(
+            `inquiries?reference_id=eq.${encodeURIComponent(referenceId)}&select=reference_id`,
+            { method: 'PATCH', headers: { Prefer: 'return=representation' }, body: JSON.stringify({ status: data.status }) }
+          );
+          if (!Array.isArray(result.data) || result.data.length === 0) {
+            res.writeHead(404, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store, private' });
+            res.end(JSON.stringify({ error: 'Enquiry not found.' }));
+            return;
+          }
+        } else {
+          const list = safeReadJsonSync(INQUIRIES_FILE, []);
+          const item = list.find((entry) => entry.referenceId === referenceId);
+          if (!item) {
+            res.writeHead(404, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store, private' });
+            res.end(JSON.stringify({ error: 'Enquiry not found.' }));
+            return;
+          }
+          item.status = data.status;
+          safeWriteJsonSync(INQUIRIES_FILE, list);
+        }
+        res.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store, private' });
+        res.end(JSON.stringify({ success: true, referenceId, status: data.status }));
+      } catch (error) {
+        sendSafeError(res, error, 'Failed to update enquiry status', requestId);
+      }
+    });
+    return;
+  }
+
+  // 8. Delete Inquiry (Admin Protected)
   const deleteInquiryMatch = pathname.match(/^\/api\/inquiries\/([^/]+)$/);
   if (req.method === 'DELETE' && deleteInquiryMatch) {
     if (!isAuthorized(req)) {

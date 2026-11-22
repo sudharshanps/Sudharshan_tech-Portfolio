@@ -181,7 +181,7 @@ flowchart TD
 
 *"Turning ideas into impactful digital solutions."*
 
-[![Contact](https://img.shields.io/badge/EMAIL-2563EB?style=for-the-badge&logo=gmail&logoColor=white)](mailto:sudharshanthemagnet@gmail.com)
+[![Contact](https://img.shields.io/badge/EMAIL-2563EB?style=for-the-badge&logo=gmail&logoColor=white)](mailto:sudharshantech123@gmail.com)
 
 ### Harini R
 **Business Development & Partnerships Associate**
@@ -200,7 +200,7 @@ flowchart TD
 
 <br/>
 
-[![Email Us](https://img.shields.io/badge/START_A_PROJECT-2563EB?style=for-the-badge&logo=maildotru&logoColor=white)](mailto:sudharshanthemagnet@gmail.com?subject=Project%20Enquiry%20%E2%80%94%20SUDHARSHAN_TECH)
+[![Email Us](https://img.shields.io/badge/START_A_PROJECT-2563EB?style=for-the-badge&logo=maildotru&logoColor=white)](mailto:sudharshantech123@gmail.com?subject=Project%20Enquiry%20%E2%80%94%20SUDHARSHAN_TECH)
 [![Instagram](https://img.shields.io/badge/FOLLOW_US-0F172A?style=for-the-badge&logo=instagram&logoColor=white)](https://www.instagram.com/sudharshan_tech/)
 
 **SUDHARSHAN_TECH**  
