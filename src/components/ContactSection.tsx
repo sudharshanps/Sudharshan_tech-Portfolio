@@ -244,7 +244,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                   </div>
                   <h3 className="text-2xl font-bold text-brand-navy">Request Received Successfully</h3>
                   <p className="text-sm text-slate-600 max-w-md mx-auto leading-relaxed">
-                    Thank you, <strong>{formData.fullName}</strong>. Your request regarding <strong>{formData.serviceType}</strong> and will reach out to <strong>{formData.email}</strong> within 24 hours.
+                    Thank you, <strong>{formData.fullName}</strong>. We have received your request for <strong>{formData.serviceType}</strong>. We will contact you at <strong>{formData.email}</strong> within 24 hours.
                   </p>
                   {submittedReference && (
                     <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 max-w-xs mx-auto text-xs font-mono text-slate-700">
