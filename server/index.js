@@ -460,15 +460,21 @@ function appendInquiry(record) {
     list.push(record);
     safeWriteJsonSync(INQUIRIES_FILE, list);
     if (sqliteDb) {
-      const stmt = sqliteDb.prepare(`
-        INSERT OR REPLACE INTO inquiries
-        (reference_id, timestamp, full_name, email, phone, company, service_type, budget_range, timeline, project_details, raw_json)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `);
-      stmt.run(record.referenceId, record.timestamp, record.fullName, record.email,
-        record.phone || '', record.company || '', record.serviceType || '',
-        record.budgetRange || '', record.timeline || '', record.projectDetails || '',
-        JSON.stringify(record));
+      try {
+        const stmt = sqliteDb.prepare(`
+          INSERT OR REPLACE INTO inquiries
+          (reference_id, timestamp, full_name, email, phone, company, service_type, budget_range, timeline, project_details, raw_json)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `);
+        stmt.run(record.referenceId, record.timestamp, record.fullName, record.email,
+          record.phone || '', record.company || '', record.serviceType || '',
+          record.budgetRange || '', record.timeline || '', record.projectDetails || '',
+          JSON.stringify(record));
+      } catch (sqlError) {
+        console.warn('[SQLite] Mirror insert failed; using durable JSON fallback:', sqlError.message);
+        try { sqliteDb.close(); } catch {}
+        sqliteDb = null;
+      }
     }
     return record;
   };
@@ -1569,6 +1575,7 @@ const server = http.createServer(async (req, res) => {
           timeline,
           projectDetails,
           estimatorBrief,
+          status: 'new',
         };
 
         // Append to server-side inquiries log & SQLite ACID mirror
