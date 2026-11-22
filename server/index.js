@@ -1412,6 +1412,12 @@ const server = http.createServer(async (req, res) => {
 
   // 4. Contact Enquiry & Project Brief Submission (Rate-Limited, Honeypot & Idempotency Protected)
   if (req.method === 'POST' && pathname === '/api/contact') {
+    // Never claim durable receipt in production while the database is unconfigured.
+    if (process.env.NODE_ENV === 'production' && !SUPABASE_ENABLED) {
+      res.writeHead(503, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store, private' });
+      res.end(JSON.stringify({ error: 'Enquiry storage is temporarily unavailable. Please contact us directly while the database is configured.' }));
+      return;
+    }
     // Rate limit: 6 submissions per 10 minutes per IP
     if (!checkRateLimit(clientIp, 'contact', 6, 10 * 60 * 1000)) {
       res.writeHead(429, {
@@ -1753,7 +1759,60 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // 7. Delete Inquiry (Admin Protected)
+  // 7. Update enquiry status (Admin Protected)
+  const updateInquiryStatusMatch = pathname.match(/^\\/api\\/inquiries\\/([^/]+)\\/status$/);
+  if (req.method === 'PATCH' && updateInquiryStatusMatch) {
+    if (!isAuthorized(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store, private' });
+      res.end(JSON.stringify({ error: 'Unauthorized: Valid x-admin-token or Bearer token required.' }));
+      return;
+    }
+    let body = '';
+    req.on('data', (chunk) => {
+      body += chunk;
+      if (body.length > 16 * 1024) req.destroy();
+    });
+    req.on('end', async () => {
+      try {
+        const data = JSON.parse(body || '{}');
+        const allowedStatuses = new Set(['new', 'reviewing', 'contacted', 'quoted', 'in_progress', 'completed', 'closed']);
+        if (!allowedStatuses.has(data.status)) {
+          res.writeHead(400, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store, private' });
+          res.end(JSON.stringify({ error: 'Invalid status. Allowed: new, reviewing, contacted, quoted, in_progress, completed, closed.' }));
+          return;
+        }
+        const referenceId = decodeURIComponent(updateInquiryStatusMatch[1]);
+        if (SUPABASE_ENABLED) {
+          const result = await supabaseRest(
+            `inquiries?reference_id=eq.${encodeURIComponent(referenceId)}&select=reference_id`,
+            { method: 'PATCH', headers: { Prefer: 'return=representation' }, body: JSON.stringify({ status: data.status }) }
+          );
+          if (!Array.isArray(result.data) || result.data.length === 0) {
+            res.writeHead(404, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store, private' });
+            res.end(JSON.stringify({ error: 'Enquiry not found.' }));
+            return;
+          }
+        } else {
+          const list = safeReadJsonSync(INQUIRIES_FILE, []);
+          const item = list.find((entry) => entry.referenceId === referenceId);
+          if (!item) {
+            res.writeHead(404, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store, private' });
+            res.end(JSON.stringify({ error: 'Enquiry not found.' }));
+            return;
+          }
+          item.status = data.status;
+          safeWriteJsonSync(INQUIRIES_FILE, list);
+        }
+        res.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store, private' });
+        res.end(JSON.stringify({ success: true, referenceId, status: data.status }));
+      } catch (error) {
+        sendSafeError(res, error, 'Failed to update enquiry status', requestId);
+      }
+    });
+    return;
+  }
+
+  // 8. Delete Inquiry (Admin Protected)
   const deleteInquiryMatch = pathname.match(/^\/api\/inquiries\/([^/]+)$/);
   if (req.method === 'DELETE' && deleteInquiryMatch) {
     if (!isAuthorized(req)) {
